@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Three.js Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 20, 0, 0.9);
+            padding: 15px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        #info h3 {
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            padding: 10px 20px;
+            text-decoration: none;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 50;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 255, 0, 0.3);
+            border-top: 4px solid #00ff00;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #error {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 20, 0, 0.95);
+            padding: 40px;
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            z-index: 1000;
+        }
+        
+        #error h2 {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+            margin-bottom: 20px;
+        }
+        
+        #error p {
+            color: #00cc00;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        #error button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        #error button:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Loading Three.js...</p>
+    </div>
+    
+    <div id="error">
+        <h2>⚠️ Error Loading Demo</h2>
+        <p id="error-message"></p>
+        <button onclick="location.reload()">🔄 Retry</button>
+        <br>
+        <a href="main-index.html" style="display: inline-block; margin-top: 15px; color: #00ff00;">← Back to Main Site</a>
+    </div>
+    
+    <div id="info" style="display: none;">
+        <h3>✓ Three.js Test</h3>
+        <p>> Rotating cube with wireframe</p>
+        <p>> Green glow effect</p>
+        <p>> If you see this, WebGL works!</p>
+    </div>
+    
+    <a href="main-index.html" class="back-button" style="display: none;" id="back-btn">← Back</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
+    <script>
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+            console.error('Error:', message);
+        }
+
+        function checkWebGLSupport() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) {
+                    return false;
+                }
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Wait for Three.js to load
+        function initScene() {
+            try {
+                if (!checkWebGLSupport()) {
+                    showError('WebGL is not supported in your browser. Please try updating your browser or enabling hardware acceleration in settings.');
+                    return;
+                }
+
+                if (typeof THREE === 'undefined') {
+                    showError('Failed to load Three.js library. Please check your internet connection.');
+                    return;
+                }
+
+                // Scene setup
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x000000);
+
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 5;
+
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.getElementById('container').appendChild(renderer.domElement);
+
+                // Create a glowing green cube
+                const geometry = new THREE.BoxGeometry(2, 2, 2);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ff00,
+                    wireframe: true
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                // Add a solid cube inside
+                const solidGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+                const solidMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x003300,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const solidCube = new THREE.Mesh(solidGeometry, solidMaterial);
+                scene.add(solidCube);
+
+                // Add lighting effect
+                const pointLight = new THREE.PointLight(0x00ff00, 1, 100);
+                pointLight.position.set(0, 0, 5);
+                scene.add(pointLight);
+
+                // Animation loop
+                function animate() {
+                    requestAnimationFrame(animate);
+                    
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    solidCube.rotation.x += 0.005;
+                    solidCube.rotation.y += 0.005;
+                    
+                    renderer.render(scene, camera);
+                }
+
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+
+                // Success! Hide loading and show info
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('info').style.display = 'block';
+                document.getElementById('back-btn').style.display = 'block';
+
+                animate();
+
+                console.log('✓ Three.js scene initialized successfully!');
+
+            } catch (error) {
+                showError('An error occurred: ' + error.message);
+                console.error('Init error:', error);
+            }
+        }
+
+        // Try to initialize after a short delay to ensure Three.js is loaded
+        setTimeout(() => {
+            try {
+                initScene();
+            } catch (error) {
+                showError('Failed to initialize: ' + error.message);
+            }
+        }, 500);
+    </script>
+</body>
+</html>

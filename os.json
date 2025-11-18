@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "name": "ASX DOOM OS",
+    "version": "1.0.0",
+    "boot": "home",
+    "timestamp_format": "YYYY-MM-DD HH:mm:ss"
+  },
+  "routes": {
+    "/": "home",
+    "/home": "home",
+    "/arcade": "arcade",
+    "/builder": "builder",
+    "/wallet": "wallet",
+    "/market": "market",
+    "/lobby": "lobby",
+    "/doom": "doom",
+    "/app/llm": "__win:llm"
+  },
+  "pages": {
+    "home": { "title": "Home", "hud": { "content": { "type": "dashboard" } } },
+    "arcade": { "title": "Arcade", "hud": { "content": { "type": "grid" } } },
+    "lobby": { "title": "Lobby", "webgl": { "scene": "hellscape" } }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "product": {
+    "name": "ASX DOOM Tournament Server",
+    "version": "1.0.0",
+    "license": "Commercial",
+    "owner": "ASX Gaming"
+  },
+  "token": {
+    "name": "ASX",
+    "contract_address": "YOUR_TOKEN_CONTRACT_ADDRESS_HERE",
+    "network": "base",
+    "enabled": true,
+    "pricing": {
+      "doom_server": 5.00,
+      "tournament_entry": 10.00,
+      "server_hosting": 2.00,
+      "premium_features": 20.00
+    }
+  },
+  "stripe": {
+    "enabled": false,
+    "publishable_key": "",
+    "secret_key": "",
+    "webhook_secret": ""
+  },
+  "coinbase": {
+    "enabled": false,
+    "api_key": "",
+    "webhook_secret": ""
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost",
+    "auto_start_doom": false,
+    "max_doom_servers": 10
+  },
+  "games": {
+    "zandronum": {
+      "path": "./games/zandronum",
+      "executable": "zandronum-server.exe",
+      "wads_folder": "wads",
+      "config_folder": "config",
+      "auto_detect": true
+    }
+  },
+  "branding": {
+    "show_asx_branding": true,
+    "custom_logo": "",
+    "custom_title": "ASX DOOM Tournament Server",
+    "footer_text": "Powered by ASX Gaming",
+    "support_url": "https://github.com/YOUR_USERNAME/asx-doom-server"
+  },
+  "licensing": {
+    "license_type": "free",
+    "license_key": "",
+    "expires": null,
+    "features": {
+      "max_servers": 1,
+      "tournaments": false,
+      "custom_branding": false,
+      "api_access": true,
+      "ollama_integration": true
+    }
+  },
+  "purchase": {
+    "source_code_price": 500.00,
+    "enterprise_price": 10000.00,
+    "payment_url": "https://YOUR_PAYMENT_PAGE.com",
+    "contact_email": "sales@asx-gaming.com"
+  }
+}

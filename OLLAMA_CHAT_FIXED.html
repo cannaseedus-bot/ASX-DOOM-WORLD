@@ -1,0 +1,469 @@
+<!-- FIXED OLLAMA PANEL - With Proper Error Handling -->
+
+<div class="panel" id="ollama-chat-panel">
+    <div class="panel-title">🤖 Ollama AI Assistant</div>
+    
+    <!-- Connection Status & Button -->
+    <div id="ollama-connection-section" style="margin-bottom: 15px;">
+        <div id="ollama-connection-status" style="padding: 10px; background: rgba(0, 40, 0, 0.5); border: 1px solid #0f0; border-radius: 3px; margin-bottom: 10px;">
+            <div style="opacity: 0.7;">⚪ Not connected to Ollama</div>
+        </div>
+        
+        <button class="btn" onclick="connectOllama()" id="ollama-connect-btn" style="width: 100%; margin-bottom: 10px;">
+            🔌 CONNECT TO OLLAMA
+        </button>
+        
+        <!-- Model List (shown after connection) -->
+        <div id="ollama-models-list" style="display: none; padding: 10px; background: rgba(0, 40, 0, 0.3); border: 1px solid #0f0; border-radius: 3px; margin-bottom: 10px;">
+            <div style="font-size: 12px; margin-bottom: 8px; opacity: 0.8;">
+                <strong>Available Models:</strong>
+            </div>
+            <div id="ollama-models-content" style="font-size: 11px; opacity: 0.7;">
+                Loading...
+            </div>
+        </div>
+        
+        <!-- Model Selector (shown when chatting) -->
+        <div id="ollama-model-select" style="display: none; margin-bottom: 10px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 12px; opacity: 0.8;">
+                Chat Model:
+            </label>
+            <select id="ollama-model-dropdown" style="width: 100%; padding: 8px; background: #001a00; color: #0f0; border: 1px solid #0f0; border-radius: 3px; font-family: 'Courier New', monospace;">
+                <option value="llama3">Llama 3</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Chat Interface (shown after connection) -->
+    <div id="ollama-chat-interface" style="display: none;">
+        <div id="ollama-chat-messages" style="height: 300px; overflow-y: auto; padding: 10px; background: rgba(0, 20, 0, 0.5); border: 1px solid #0f0; border-radius: 3px; margin-bottom: 10px; font-size: 13px; line-height: 1.6;">
+            <div style="text-align: center; opacity: 0.5; padding: 20px;">
+                🤖 Ready to chat! Ask me anything...
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <input 
+                type="text" 
+                id="ollama-chat-input" 
+                placeholder="Ask Ollama anything..." 
+                style="flex: 1; padding: 10px; background: #001a00; color: #0f0; border: 1px solid #0f0; border-radius: 3px; font-family: 'Courier New', monospace;"
+            />
+            <button 
+                class="btn" 
+                id="ollama-send-btn" 
+                onclick="sendOllamaMessage()" 
+                style="padding: 10px 20px;"
+            >
+                SEND
+            </button>
+        </div>
+        
+        <div style="display: flex; gap: 5px; font-size: 11px;">
+            <button 
+                onclick="clearOllamaChat()" 
+                style="flex: 1; padding: 5px; background: rgba(100, 0, 0, 0.3); color: #f00; border: 1px solid #f00; border-radius: 3px; cursor: pointer;"
+            >
+                🗑️ Clear
+            </button>
+            <button 
+                onclick="disconnectOllama()" 
+                style="flex: 1; padding: 5px; background: rgba(0, 0, 0, 0.3); color: #ff0; border: 1px solid #ff0; border-radius: 3px; cursor: pointer;"
+            >
+                🔌 Disconnect
+            </button>
+        </div>
+    </div>
+
+    <div style="margin-top: 10px; font-size: 11px; opacity: 0.6; text-align: center;">
+        💡 Tip: Ask about DOOM, coding, or server management!
+    </div>
+</div>
+
+<script>
+// Ollama Chat System - WITH PROPER NULL CHECKS
+let ollamaMessages = [];
+let currentOllamaModel = 'llama3';
+let ollamaConnectedState = false;
+
+// Helper function to safely get element
+function getElement(id) {
+    const el = document.getElementById(id);
+    if (!el) {
+        console.warn(`Element not found: ${id}`);
+    }
+    return el;
+}
+
+// Helper function to safely set innerHTML
+function setHTML(id, html) {
+    const el = getElement(id);
+    if (el) {
+        el.innerHTML = html;
+        return true;
+    }
+    return false;
+}
+
+// Helper function to safely set display
+function setDisplay(id, display) {
+    const el = getElement(id);
+    if (el) {
+        el.style.display = display;
+        return true;
+    }
+    return false;
+}
+
+// Connect to Ollama
+async function connectOllama() {
+    console.log('🔌 Connecting to Ollama...');
+    if (typeof log !== 'undefined') {
+        log('🔌 Connecting to Ollama...', 'info');
+    }
+    
+    const connectBtn = getElement('ollama-connect-btn');
+    if (connectBtn) {
+        connectBtn.disabled = true;
+        connectBtn.textContent = '⏳ CONNECTING...';
+    }
+    
+    try {
+        const response = await fetch('/api/ollama/connect', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            ollamaConnectedState = true;
+            console.log('✅ Ollama connected!');
+            if (typeof log !== 'undefined') {
+                log('✅ Ollama connected successfully!', 'info');
+            }
+            
+            // Update connection status
+            setHTML('ollama-connection-status', `
+                <div style="color: #0f0;">
+                    ✅ <strong>Connected to Ollama</strong>
+                </div>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">
+                    ${data.models.length} model(s) available
+                </div>
+            `);
+            
+            // Update connect button
+            if (connectBtn) {
+                connectBtn.textContent = '✅ CONNECTED';
+                connectBtn.style.background = 'rgba(0, 100, 0, 0.3)';
+                connectBtn.disabled = true;
+            }
+            
+            // Show models list
+            setDisplay('ollama-models-list', 'block');
+            
+            const modelsContent = data.models.map(m => {
+                const size = m.size ? `(${(m.size / 1e9).toFixed(1)}GB)` : '';
+                return `• ${m.name} ${size}`;
+            }).join('<br>');
+            
+            setHTML('ollama-models-content', modelsContent || 'No models found');
+            
+            // Populate model selector
+            const select = getElement('ollama-model-dropdown');
+            if (select) {
+                select.innerHTML = data.models.map(m => 
+                    `<option value="${m.name}">${m.name}</option>`
+                ).join('');
+            }
+            
+            // Show model selector and chat interface
+            setDisplay('ollama-model-select', 'block');
+            setDisplay('ollama-chat-interface', 'block');
+            
+            // Set initial model
+            if (data.models.length > 0) {
+                currentOllamaModel = data.models[0].name;
+            }
+            
+            // Add welcome message
+            setHTML('ollama-chat-messages', `
+                <div style="text-align: center; opacity: 0.7; padding: 10px; border-bottom: 1px solid rgba(0, 255, 0, 0.3); margin-bottom: 10px;">
+                    🤖 <strong>Ollama AI Connected!</strong><br>
+                    <span style="font-size: 11px;">Model: ${currentOllamaModel}</span>
+                </div>
+            `);
+            
+        } else {
+            throw new Error(data.error || 'Connection failed');
+        }
+    } catch (error) {
+        ollamaConnectedState = false;
+        console.error('❌ Ollama connection failed:', error);
+        if (typeof log !== 'undefined') {
+            log(`❌ Failed to connect: ${error.message}`, 'error');
+        }
+        
+        setHTML('ollama-connection-status', `
+            <div style="color: #ff0;">
+                ⚠️ <strong>Connection Failed</strong>
+            </div>
+            <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">
+                ${error.message}
+            </div>
+            <div style="font-size: 11px; margin-top: 8px; padding: 5px; background: rgba(0, 0, 0, 0.3); border-radius: 3px;">
+                Start Ollama: <code style="color: #0ff;">ollama serve</code>
+            </div>
+        `);
+        
+        if (connectBtn) {
+            connectBtn.textContent = '🔌 CONNECT TO OLLAMA';
+            connectBtn.disabled = false;
+            connectBtn.style.background = '';
+        }
+    }
+}
+
+// Disconnect from Ollama
+function disconnectOllama() {
+    ollamaConnectedState = false;
+    ollamaMessages = [];
+    
+    // Reset UI
+    setHTML('ollama-connection-status', `
+        <div style="opacity: 0.7;">⚪ Not connected to Ollama</div>
+    `);
+    
+    const connectBtn = getElement('ollama-connect-btn');
+    if (connectBtn) {
+        connectBtn.textContent = '🔌 CONNECT TO OLLAMA';
+        connectBtn.disabled = false;
+        connectBtn.style.background = '';
+    }
+    
+    setDisplay('ollama-models-list', 'none');
+    setDisplay('ollama-model-select', 'none');
+    setDisplay('ollama-chat-interface', 'none');
+    
+    console.log('🔌 Disconnected from Ollama');
+    if (typeof log !== 'undefined') {
+        log('🔌 Disconnected from Ollama', 'info');
+    }
+}
+
+// Send message to Ollama
+async function sendOllamaMessage() {
+    const input = getElement('ollama-chat-input');
+    if (!input) return;
+    
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    if (!ollamaConnectedState) {
+        console.error('❌ Not connected to Ollama');
+        if (typeof log !== 'undefined') {
+            log('❌ Not connected to Ollama', 'error');
+        }
+        return;
+    }
+    
+    // Clear input
+    input.value = '';
+    
+    // Get selected model
+    const modelSelect = getElement('ollama-model-dropdown');
+    currentOllamaModel = modelSelect ? modelSelect.value : 'llama3';
+    
+    // Add user message to chat
+    addOllamaChatMessage('user', message);
+    
+    // Add thinking indicator
+    const thinkingId = addOllamaChatMessage('assistant', '🤔 Thinking...', true);
+    
+    // Prepare messages
+    ollamaMessages.push({
+        role: 'user',
+        content: message
+    });
+    
+    console.log(`💬 Asking ${currentOllamaModel}: ${message.substring(0, 50)}...`);
+    if (typeof log !== 'undefined') {
+        log(`💬 Asking ${currentOllamaModel}: ${message.substring(0, 50)}...`, 'info');
+    }
+    
+    try {
+        const response = await fetch('/api/ollama/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: currentOllamaModel,
+                messages: ollamaMessages
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Remove thinking indicator
+        const thinkingEl = getElement(thinkingId);
+        if (thinkingEl) thinkingEl.remove();
+        
+        // Get AI response
+        const aiMessage = data.message?.content || data.response || 'No response from AI';
+        
+        // Add AI response
+        addOllamaChatMessage('assistant', aiMessage);
+        
+        // Add to history
+        ollamaMessages.push({
+            role: 'assistant',
+            content: aiMessage
+        });
+        
+        console.log('✅ Ollama responded');
+        if (typeof log !== 'undefined') {
+            log('✅ Ollama responded', 'info');
+        }
+        
+    } catch (error) {
+        const thinkingEl = getElement(thinkingId);
+        if (thinkingEl) thinkingEl.remove();
+        
+        addOllamaChatMessage('system', `❌ Error: ${error.message}`);
+        console.error('❌ Ollama error:', error);
+        if (typeof log !== 'undefined') {
+            log(`❌ Ollama error: ${error.message}`, 'error');
+        }
+    }
+}
+
+// Add message to chat UI
+function addOllamaChatMessage(role, content, isTemp = false) {
+    const messagesDiv = getElement('ollama-chat-messages');
+    if (!messagesDiv) {
+        console.warn('Chat messages div not found');
+        return null;
+    }
+    
+    const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    let bgColor, textColor, icon;
+    
+    if (role === 'user') {
+        bgColor = 'rgba(0, 50, 100, 0.3)';
+        textColor = '#0ff';
+        icon = '👤';
+    } else if (role === 'assistant') {
+        bgColor = 'rgba(0, 100, 0, 0.3)';
+        textColor = '#0f0';
+        icon = '🤖';
+    } else {
+        bgColor = 'rgba(100, 0, 0, 0.3)';
+        textColor = '#f00';
+        icon = '⚠️';
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.id = messageId;
+    messageDiv.style.cssText = `
+        margin-bottom: 10px;
+        padding: 8px;
+        background: ${bgColor};
+        border-left: 3px solid ${textColor};
+        border-radius: 3px;
+        animation: slideIn 0.2s ease-out;
+    `;
+    
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+    
+    messageDiv.innerHTML = `
+        <div style="font-size: 11px; opacity: 0.7; margin-bottom: 3px;">
+            ${icon} <strong style="color: ${textColor};">${role.toUpperCase()}</strong>
+            <span style="float: right; opacity: 0.5;">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div style="color: ${textColor}; white-space: pre-wrap; word-wrap: break-word;">
+            ${escapeHtml(content)}
+        </div>
+    `;
+    
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    return messageId;
+}
+
+// Clear chat
+function clearOllamaChat() {
+    if (!confirm('Clear all chat messages?')) return;
+    
+    ollamaMessages = [];
+    setHTML('ollama-chat-messages', `
+        <div style="text-align: center; opacity: 0.7; padding: 10px;">
+            🧹 Chat cleared. Start a new conversation!
+        </div>
+    `);
+    console.log('🧹 Chat cleared');
+    if (typeof log !== 'undefined') {
+        log('🧹 Chat cleared', 'info');
+    }
+}
+
+// Enter key to send - Setup after DOM loads
+window.addEventListener('DOMContentLoaded', () => {
+    const input = getElement('ollama-chat-input');
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendOllamaMessage();
+            }
+        });
+    }
+});
+</script>
+
+<style>
+/* Chat animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Chat scrollbar styling */
+#ollama-chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+#ollama-chat-messages::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+#ollama-chat-messages::-webkit-scrollbar-thumb {
+    background: #0f0;
+    border-radius: 4px;
+}
+
+#ollama-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #0ff;
+}
+
+/* Model list styling */
+#ollama-models-content {
+    line-height: 1.6;
+}
+</style>

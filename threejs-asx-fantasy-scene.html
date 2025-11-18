@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Scene - ASX Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 20, 0, 0.9);
+            padding: 15px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            color: #00ff00;
+            font-size: 14px;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            max-width: 300px;
+        }
+        
+        #info h3 {
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        #message {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 20, 0, 0.95);
+            padding: 15px 30px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            color: #00ff00;
+            font-size: 16px;
+            display: none;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            padding: 10px 20px;
+            text-decoration: none;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 100;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .back-button:hover {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="info">
+        <h3>🏰 Fantasy Scene</h3>
+        <p>> Click objects to interact</p>
+        <p>> Mouse drag to orbit</p>
+        <p>> Scroll to zoom</p>
+    </div>
+    
+    <div id="message"></div>
+    
+    <a href="main-index.html" class="back-button">← Back to Menu</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
+    <script>
+        // WebGL Detection and Error Handling
+        function checkWebGLSupport() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) {
+                    throw new Error('WebGL not supported');
+                }
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        if (!checkWebGLSupport()) {
+            document.getElementById('canvas-container').innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; padding: 40px; text-align: center;">
+                    <h2 style="color: #ff0000; text-shadow: 0 0 10px #ff0000; margin-bottom: 20px;">⚠️ WebGL Not Supported</h2>
+                    <p style="color: #00ff00; margin-bottom: 15px;">Your browser doesn't support WebGL, which is required for 3D graphics.</p>
+                    <p style="color: #00cc00; margin-bottom: 15px;">Please try:</p>
+                    <ul style="color: #00cc00; text-align: left; max-width: 400px;">
+                        <li>Updating your browser to the latest version</li>
+                        <li>Enabling hardware acceleration in browser settings</li>
+                        <li>Using a different browser (Chrome, Firefox, or Edge)</li>
+                        <li>Updating your graphics drivers</li>
+                    </ul>
+                    <a href="main-index.html" style="margin-top: 30px; padding: 15px 30px; border: 2px solid #00ff00; background: rgba(0, 255, 0, 0.1); color: #00ff00; text-decoration: none; border-radius: 5px;">← Back to Main Site</a>
+                </div>
+            `;
+            throw new Error('WebGL not supported');
+        }
+
+        if (typeof THREE === 'undefined') {
+            document.getElementById('canvas-container').innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; padding: 40px; text-align: center;">
+                    <h2 style="color: #ff0000; text-shadow: 0 0 10px #ff0000; margin-bottom: 20px;">⚠️ Loading Error</h2>
+                    <p style="color: #00ff00; margin-bottom: 15px;">Failed to load Three.js library.</p>
+                    <p style="color: #00cc00; margin-bottom: 15px;">Please check your internet connection and refresh the page.</p>
+                    <button onclick="location.reload()" style="margin-top: 20px; padding: 15px 30px; border: 2px solid #00ff00; background: rgba(0, 255, 0, 0.1); color: #00ff00; border-radius: 5px; cursor: pointer; font-family: 'Courier New', monospace; font-weight: bold;">🔄 Retry</button>
+                </div>
+            `;
+            throw new Error('Three.js not loaded');
+        }
+    </script>
+    <script>
+        // ASX JSON data structure
+        const asxData = {
+            "version": "1.0",
+            "scene": {
+                "background": "#000000",
+                "fog": {
+                    "type": "fog",
+                    "color": "#001100",
+                    "near": 10,
+                    "far": 50
+                }
+            },
+            "geometries": [
+                {
+                    "id": "knightBody",
+                    "type": "box",
+                    "parameters": {
+                        "width": 1,
+                        "height": 2,
+                        "depth": 0.5
+                    }
+                },
+                {
+                    "id": "knightHead",
+                    "type": "box",
+                    "parameters": {
+                        "width": 0.6,
+                        "height": 0.6,
+                        "depth": 0.6
+                    }
+                },
+                {
+                    "id": "chestBox",
+                    "type": "box",
+                    "parameters": {
+                        "width": 1.5,
+                        "height": 1,
+                        "depth": 1
+                    }
+                },
+                {
+                    "id": "swordBlade",
+                    "type": "box",
+                    "parameters": {
+                        "width": 0.1,
+                        "height": 2,
+                        "depth": 0.05
+                    }
+                },
+                {
+                    "id": "swordHandle",
+                    "type": "cylinder",
+                    "parameters": {
+                        "radiusTop": 0.08,
+                        "radiusBottom": 0.08,
+                        "height": 0.5,
+                        "radialSegments": 8
+                    }
+                },
+                {
+                    "id": "groundPlane",
+                    "type": "plane",
+                    "parameters": {
+                        "width": 30,
+                        "height": 30
+                    }
+                }
+            ],
+            "materials": [
+                {
+                    "id": "knightMaterial",
+                    "type": "MeshStandardMaterial",
+                    "properties": {
+                        "color": "#00ff00",
+                        "metalness": 0.7,
+                        "roughness": 0.3,
+                        "emissive": "#004400",
+                        "emissiveIntensity": 0.3
+                    }
+                },
+                {
+                    "id": "chestMaterial",
+                    "type": "MeshStandardMaterial",
+                    "properties": {
+                        "color": "#00cc00",
+                        "metalness": 0.5,
+                        "roughness": 0.5,
+                        "emissive": "#003300",
+                        "emissiveIntensity": 0.2
+                    }
+                },
+                {
+                    "id": "swordMaterial",
+                    "type": "MeshStandardMaterial",
+                    "properties": {
+                        "color": "#00ffff",
+                        "metalness": 0.9,
+                        "roughness": 0.1,
+                        "emissive": "#00ffff",
+                        "emissiveIntensity": 0.5
+                    }
+                },
+                {
+                    "id": "groundMaterial",
+                    "type": "MeshStandardMaterial",
+                    "properties": {
+                        "color": "#002200",
+                        "roughness": 0.9
+                    }
+                }
+            ],
+            "objects": [
+                {
+                    "id": "knight",
+                    "type": "group",
+                    "position": [-3, 1, 0],
+                    "children": [
+                        {
+                            "id": "knightBodyMesh",
+                            "geometry": "knightBody",
+                            "material": "knightMaterial",
+                            "position": [0, 0, 0]
+                        },
+                        {
+                            "id": "knightHeadMesh",
+                            "geometry": "knightHead",
+                            "material": "knightMaterial",
+                            "position": [0, 1.3, 0]
+                        }
+                    ]
+                },
+                {
+                    "id": "chest",
+                    "geometry": "chestBox",
+                    "material": "chestMaterial",
+                    "position": [0, 0.5, 0]
+                },
+                {
+                    "id": "sword",
+                    "type": "group",
+                    "position": [3, 2, 0],
+                    "children": [
+                        {
+                            "id": "swordBladeMesh",
+                            "geometry": "swordBlade",
+                            "material": "swordMaterial",
+                            "position": [0, 0.5, 0]
+                        },
+                        {
+                            "id": "swordHandleMesh",
+                            "geometry": "swordHandle",
+                            "material": "swordMaterial",
+                            "position": [0, -0.5, 0],
+                            "rotation": [Math.PI / 2, 0, 0]
+                        }
+                    ]
+                },
+                {
+                    "id": "ground",
+                    "geometry": "groundPlane",
+                    "material": "groundMaterial",
+                    "position": [0, 0, 0],
+                    "rotation": [-Math.PI / 2, 0, 0],
+                    "receiveShadow": true
+                }
+            ]
+        };
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(asxData.scene.background);
+        scene.fog = new THREE.Fog(asxData.scene.fog.color, asxData.scene.fog.near, asxData.scene.fog.far);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 10);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x00ff00, 0.3);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0x00ff00, 0.8);
+        directionalLight.position.set(5, 10, 5);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.camera.left = -10;
+        directionalLight.shadow.camera.right = 10;
+        directionalLight.shadow.camera.top = 10;
+        directionalLight.shadow.camera.bottom = -10;
+        scene.add(directionalLight);
+
+        const pointLight = new THREE.PointLight(0x00ffff, 1, 10);
+        pointLight.position.set(3, 2, 0);
+        scene.add(pointLight);
+
+        // Build scene from ASX data
+        const geometries = {};
+        const materials = {};
+        const objects = {};
+
+        // Create geometries
+        asxData.geometries.forEach(geomData => {
+            let geometry;
+            switch (geomData.type) {
+                case 'box':
+                    const b = geomData.parameters;
+                    geometry = new THREE.BoxGeometry(b.width, b.height, b.depth);
+                    break;
+                case 'cylinder':
+                    const c = geomData.parameters;
+                    geometry = new THREE.CylinderGeometry(c.radiusTop, c.radiusBottom, c.height, c.radialSegments);
+                    break;
+                case 'plane':
+                    const p = geomData.parameters;
+                    geometry = new THREE.PlaneGeometry(p.width, p.height);
+                    break;
+            }
+            geometries[geomData.id] = geometry;
+        });
+
+        // Create materials
+        asxData.materials.forEach(matData => {
+            const material = new THREE.MeshStandardMaterial(matData.properties);
+            materials[matData.id] = material;
+        });
+
+        // Create objects
+        function createObject(objData) {
+            if (objData.type === 'group') {
+                const group = new THREE.Group();
+                group.name = objData.id;
+                if (objData.position) group.position.set(...objData.position);
+                if (objData.rotation) group.rotation.set(...objData.rotation);
+                
+                if (objData.children) {
+                    objData.children.forEach(child => {
+                        const childObj = createObject(child);
+                        group.add(childObj);
+                    });
+                }
+                
+                objects[objData.id] = group;
+                return group;
+            } else {
+                const geometry = geometries[objData.geometry];
+                const material = materials[objData.material];
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.name = objData.id;
+                
+                if (objData.position) mesh.position.set(...objData.position);
+                if (objData.rotation) mesh.rotation.set(...objData.rotation);
+                if (objData.castShadow) mesh.castShadow = true;
+                if (objData.receiveShadow) mesh.receiveShadow = true;
+                
+                mesh.castShadow = true;
+                
+                objects[objData.id] = mesh;
+                return mesh;
+            }
+        }
+
+        asxData.objects.forEach(objData => {
+            const obj = createObject(objData);
+            scene.add(obj);
+        });
+
+        // OrbitControls (simplified version)
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let cameraRotation = { x: 0, y: 0 };
+
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            isDragging = true;
+        });
+
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+                
+                cameraRotation.y += deltaX * 0.005;
+                cameraRotation.x += deltaY * 0.005;
+                
+                cameraRotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraRotation.x));
+            }
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        renderer.domElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        renderer.domElement.addEventListener('wheel', (e) => {
+            const zoomSpeed = 0.1;
+            camera.position.z += e.deltaY * zoomSpeed * 0.01;
+            camera.position.z = Math.max(5, Math.min(20, camera.position.z));
+        });
+
+        // Raycasting for click detection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const messageDiv = document.getElementById('message');
+
+        renderer.domElement.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+
+            if (intersects.length > 0) {
+                const clickedObject = intersects[0].object;
+                let message = '';
+
+                if (clickedObject.name.includes('knight') || clickedObject.parent.name === 'knight') {
+                    message = '⚔️ Knight: "The Matrix guards this realm."';
+                } else if (clickedObject.name === 'chest') {
+                    message = '💎 Treasure Chest: "Digital treasures await within..."';
+                } else if (clickedObject.name.includes('sword') || clickedObject.parent.name === 'sword') {
+                    message = '✨ Magical Sword: "This blade cuts through code itself!"';
+                }
+
+                if (message) {
+                    messageDiv.textContent = message;
+                    messageDiv.style.display = 'block';
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 3000);
+                }
+            }
+        });
+
+        // Animation
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.016;
+
+            // Update camera position based on rotation
+            const distance = 10;
+            camera.position.x = distance * Math.sin(cameraRotation.y) * Math.cos(cameraRotation.x);
+            camera.position.y = distance * Math.sin(cameraRotation.x) + 5;
+            camera.position.z = distance * Math.cos(cameraRotation.y) * Math.cos(cameraRotation.x);
+            camera.lookAt(0, 1, 0);
+
+            // Animate knight (breathing)
+            if (objects.knight) {
+                objects.knight.scale.y = 1 + Math.sin(time * 2) * 0.05;
+            }
+
+            // Animate chest (floating)
+            if (objects.chest) {
+                objects.chest.position.y = 0.5 + Math.sin(time * 1.5) * 0.3;
+                objects.chest.rotation.y += 0.01;
+            }
+
+            // Animate sword (rotating)
+            if (objects.sword) {
+                objects.sword.rotation.y += 0.02;
+                objects.sword.position.y = 2 + Math.sin(time * 2) * 0.2;
+            }
+
+            // Pulsing light on sword
+            pointLight.intensity = 0.8 + Math.sin(time * 3) * 0.3;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        console.log('Fantasy scene loaded successfully!');
+    </script>
+</body>
+</html>

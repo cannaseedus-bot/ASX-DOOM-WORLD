@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASX Model Builder - Matrix Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Matrix falling characters effect */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        header {
+            padding: 20px;
+            border-bottom: 2px solid #00ff00;
+            background: rgba(0, 20, 0, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+            letter-spacing: 2px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #00ff00;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .nav-links a:hover {
+            text-shadow: 0 0 15px #00ff00;
+            transform: scale(1.1);
+        }
+        
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3em;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-icon:hover {
+            transform: scale(1.1);
+            text-shadow: 0 0 15px #00ff00;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #00ff00;
+            color: #000000;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
+            letter-spacing: 3px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00; }
+            to { text-shadow: 0 0 30px #00ff00, 0 0 60px #00ff00, 0 0 80px #00ff00; }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #00cc00;
+        }
+        
+        .hero-description {
+            font-size: 1.1em;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+            color: #00cc00;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00ff00;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .cta-button:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .cta-button.primary {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+        }
+        
+        /* Features Section */
+        .features {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            text-shadow: 0 0 15px #00ff00;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 20, 0, 0.8);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .feature-card p {
+            color: #00cc00;
+            line-height: 1.6;
+        }
+        
+        /* Gallery Section */
+        .gallery {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .product-card {
+            background: rgba(0, 20, 0, 0.9);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.7);
+        }
+        
+        .product-preview {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #001100 0%, #003300 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            border-bottom: 2px solid #00ff00;
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-info h3 {
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .product-info p {
+            color: #00cc00;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #00ff00;
+        }
+        
+        .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .add-to-cart {
+            padding: 10px 20px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .add-to-cart:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(0, 20, 0, 0.98);
+            border-left: 2px solid #00ff00;
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.5);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-sidebar.open {
+            right: 0;
+        }
+        
+        .cart-header {
+            padding: 20px;
+            border-bottom: 2px solid #00ff00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-header h2 {
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .close-cart {
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+        }
+        
+        .close-cart:hover {
+            text-shadow: 0 0 15px #00ff00;
+            transform: scale(1.2);
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cart-item {
+            background: rgba(0, 40, 0, 0.5);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .cart-item h4 {
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .cart-item-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 3px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .quantity-btn:hover {
+            background: rgba(0, 255, 0, 0.3);
+        }
+        
+        .remove-item {
+            color: #ff0000;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ff0000;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-item:hover {
+            background: rgba(255, 0, 0, 0.2);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        .cart-footer {
+            padding: 20px;
+            border-top: 2px solid #00ff00;
+        }
+        
+        .cart-total {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .checkout-btn:hover {
+            background: rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 40px 20px;
+            color: #00cc00;
+        }
+        
+        /* Footer */
+        footer {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 40px 20px;
+            border-top: 2px solid #00ff00;
+            text-align: center;
+            color: #00cc00;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .nav-links {
+                gap: 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="content-wrapper">
+        <!-- Header -->
+        <header>
+            <nav>
+                <div class="logo">⚡ ASX BUILDER</div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#gallery">Gallery</a>
+                    <a href="chat.html">AI Builder</a>
+                    <a href="debug-threejs-asx.html" title="Debug Console">🔍</a>
+                    <div class="cart-icon" onclick="toggleCart()">
+                        🛒
+                        <span class="cart-count" id="cart-count">0</span>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>BUILD THE MATRIX</h1>
+            <p class="hero-subtitle">Create Stunning 3D Game Assets with AI-Powered ASX JSON</p>
+            <p class="hero-description">
+                Transform your imagination into interactive 3D models. Our AI-powered builder converts your descriptions into production-ready Three.js assets using the ASX JSON format. No modeling software required.
+            </p>
+            <div class="cta-buttons">
+                <a href="chat.html" class="cta-button primary">🤖 Launch AI Builder</a>
+                <a href="#gallery" class="cta-button">📦 Browse Gallery</a>
+                <a href="simple-threejs-demo.html" class="cta-button">🎮 Test WebGL</a>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2 class="section-title">>>> SYSTEM FEATURES</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🤖 AI-Powered Generation</h3>
+                    <p>Describe your asset in plain English. Our AI assistant guides you through the creation process, asking clarifying questions and generating perfect ASX JSON code.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Instant Preview</h3>
+                    <p>See your creations come to life immediately. Every generated asset includes a complete HTML file ready to run in any browser.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎨 Full Material Control</h3>
+                    <p>Advanced PBR materials with metalness, roughness, emissive properties, and texture mapping. Create photorealistic or stylized assets.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔄 Animation System</h3>
+                    <p>Built-in animation support with Three.js AnimationMixer. Create breathing characters, rotating objects, and complex motion sequences.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Interactive Events</h3>
+                    <p>Add click handlers, hover effects, and physics interactions. Make your assets respond to user input with raycasting support.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📦 Production Ready</h3>
+                    <p>Export clean, optimized ASX JSON compatible with Three.js ObjectLoader. Drop into any game engine or web application.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Gallery Section -->
+        <section class="gallery" id="gallery">
+            <h2 class="section-title">>>> ASSET GALLERY</h2>
+            
+            <!-- Troubleshooting Notice -->
+            <div style="background: rgba(0, 20, 0, 0.8); border: 2px solid #ffff00; border-radius: 5px; padding: 20px; margin-bottom: 30px; text-align: left;">
+                <h3 style="color: #ffff00; text-shadow: 0 0 10px #ffff00; margin-bottom: 15px;">⚠️ Demo Troubleshooting</h3>
+                <p style="color: #00cc00; margin-bottom: 10px;">If demos don't load, try:</p>
+                <ul style="color: #00cc00; padding-left: 20px;">
+                    <li>Click "Test WebGL" button above first to verify your browser supports 3D graphics</li>
+                    <li>Try the <a href="debug-threejs-asx.html" style="color: #00ff00; text-decoration: underline;">Debug Console</a> to see detailed diagnostics</li>
+                    <li>Enable hardware acceleration in your browser settings</li>
+                    <li>Update your browser to the latest version</li>
+                    <li>Try a different browser (Chrome, Firefox, or Edge recommended)</li>
+                </ul>
+            </div>
+            
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Products will be dynamically inserted here -->
+            </div>
+        </section>
+        
+        <!-- Cart Sidebar -->
+        <div class="cart-sidebar" id="cart-sidebar">
+            <div class="cart-header">
+                <h2>🛒 YOUR CART</h2>
+                <span class="close-cart" onclick="toggleCart()">✕</span>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <div class="empty-cart">
+                    <p>Your cart is empty</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">Add some assets to get started!</p>
+                </div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    TOTAL: <span id="cart-total">$0.00</span>
+                </div>
+                <button class="checkout-btn" onclick="checkout()">⚡ CHECKOUT</button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2025 ASX Model Builder | Powered by Three.js & Matrix Code</p>
+            <p style="margin-top: 10px;">Open Source | MIT License</p>
+        </footer>
+    </div>
+
+    <script>
+        // Matrix falling characters effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~アイウエオカキクケコサシスセソタチツテト'.split('');
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Product Data
+        const products = [
+            {
+                id: 1,
+                name: "Fantasy Knight Pack",
+                description: "Complete medieval knight with armor, weapons, and animations. Includes 5 color variations.",
+                price: 29.99,
+                icon: "⚔️",
+                demo: "threejs-asx-fantasy-scene.html"
+            },
+            {
+                id: 2,
+                name: "Treasure Chest Set",
+                description: "Animated treasure chest with opening animation and particle effects. Multiple sizes included.",
+                price: 19.99,
+                icon: "💎",
+                demo: "threejs-asx-fantasy-scene.html"
+            },
+            {
+                id: 3,
+                name: "Magic Sword Collection",
+                description: "10 magical swords with glowing effects, particle trails, and combat animations.",
+                price: 39.99,
+                icon: "✨",
+                demo: "threejs-asx-fantasy-scene.html"
+            },
+            {
+                id: 4,
+                name: "Sci-Fi Props Pack",
+                description: "50+ futuristic props including consoles, holograms, and interactive terminals.",
+                price: 49.99,
+                icon: "🚀",
+                demo: "debug-threejs-asx.html"
+            },
+            {
+                id: 5,
+                name: "Environment Kit",
+                description: "Complete scene building kit with terrain, vegetation, rocks, and atmospheric effects.",
+                price: 59.99,
+                icon: "🏔️",
+                demo: "debug-threejs-asx.html"
+            },
+            {
+                id: 6,
+                name: "Character Starter Pack",
+                description: "Base character models with rigging, animations, and customization options.",
+                price: 44.99,
+                icon: "🧙",
+                demo: "threejs-asx-fantasy-scene.html"
+            },
+            {
+                id: 7,
+                name: "UI Elements Pro",
+                description: "Professional game UI components with hover effects and click animations.",
+                price: 24.99,
+                icon: "🎮",
+                demo: "debug-threejs-asx.html"
+            },
+            {
+                id: 8,
+                name: "Particle FX Library",
+                description: "200+ particle effects for magic, explosions, weather, and environmental effects.",
+                price: 34.99,
+                icon: "💫",
+                demo: "debug-threejs-asx.html"
+            },
+            {
+                id: 9,
+                name: "Complete Mega Bundle",
+                description: "Every asset pack at 50% off! Lifetime updates and priority support included.",
+                price: 199.99,
+                icon: "🎁",
+                demo: "threejs-asx-fantasy-scene.html"
+            }
+        ];
+
+        // Shopping Cart
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = products.map(product => `
+                <div class="product-card" onclick="viewDemo('${product.demo}')">
+                    <div class="product-preview">${product.icon}</div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <div class="product-footer">
+                            <span class="price">$${product.price}</span>
+                            <button class="add-to-cart" onclick="addToCart(event, ${product.id})">
+                                ADD TO CART
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(event, productId) {
+            event.stopPropagation();
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            saveCart();
+            updateCart();
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ ADDED';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 1000);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            updateCart();
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    saveCart();
+                    updateCart();
+                }
+            }
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartCount.textContent = totalItems;
+            cartTotal.textContent = `$${totalPrice.toFixed(2)}`;
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <p>Your cart is empty</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Add some assets to get started!</p>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <h4>${item.icon} ${item.name}</h4>
+                        <p>$${item.price} each</p>
+                        <div class="cart-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                            </div>
+                            <span class="remove-item" onclick="removeFromCart(${item.id})">REMOVE</span>
+                        </div>
+                        <p style="margin-top: 10px; text-align: right;">Subtotal: $${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('open');
+        }
+
+        function viewDemo(demoUrl) {
+            window.open(demoUrl, '_blank');
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            alert(`🎉 Checkout initiated!\n\nTotal: $${total.toFixed(2)}\n\nThis is a demo - no actual payment will be processed.\n\nIn production, this would connect to Stripe, PayPal, etc.`);
+        }
+
+        // Initialize
+        renderGallery();
+        updateCart();
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

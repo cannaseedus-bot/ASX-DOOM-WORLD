@@ -1,0 +1,115 @@
+<!-- ADD THIS TO public/index.html BEFORE THE CLOSING </body> TAG -->
+
+<!-- Upgrade Modal -->
+<div id="upgrade-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; padding: 20px;">
+    <div style="max-width: 800px; margin: 50px auto; background: #001a00; border: 3px solid #0f0; border-radius: 10px; padding: 30px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);">
+        <div style="text-align: right;">
+            <button onclick="closeUpgradeModal()" style="background: none; border: 2px solid #f00; color: #f00; padding: 5px 15px; cursor: pointer; border-radius: 3px;">✕ CLOSE</button>
+        </div>
+        
+        <h2 style="text-align: center; font-size: 32px; margin: 20px 0; color: #0ff;">💎 UPGRADE YOUR SERVER</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;">
+            <!-- Source Code Package -->
+            <div style="border: 2px solid #0f0; border-radius: 5px; padding: 20px; background: rgba(0, 40, 0, 0.5);">
+                <h3 style="color: #0ff; margin-bottom: 10px;">📦 SOURCE CODE</h3>
+                <div style="font-size: 36px; font-weight: bold; color: #ff0; margin: 15px 0;">$500</div>
+                
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <div style="margin: 10px 0;">✅ Complete source code</div>
+                    <div style="margin: 10px 0;">✅ Use YOUR token</div>
+                    <div style="margin: 10px 0;">✅ Remove ASX branding</div>
+                    <div style="margin: 10px 0;">✅ Commercial license</div>
+                    <div style="margin: 10px 0;">✅ Lifetime updates</div>
+                    <div style="margin: 10px 0;">✅ Email support</div>
+                </div>
+                
+                <button class="btn" onclick="purchaseSourceCode()" style="width: 100%; margin-top: 20px; background: rgba(0, 255, 0, 0.2);">
+                    🛒 BUY SOURCE CODE
+                </button>
+            </div>
+            
+            <!-- Enterprise Package -->
+            <div style="border: 2px solid #ff0; border-radius: 5px; padding: 20px; background: rgba(40, 40, 0, 0.5);">
+                <h3 style="color: #ff0; margin-bottom: 10px;">🏢 ENTERPRISE</h3>
+                <div style="font-size: 36px; font-weight: bold; color: #0ff; margin: 15px 0;">$10,000</div>
+                
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <div style="margin: 10px 0;">✅ Everything in Source Code</div>
+                    <div style="margin: 10px 0;">✅ Custom features built</div>
+                    <div style="margin: 10px 0;">✅ Deployment assistance</div>
+                    <div style="margin: 10px 0;">✅ 1 year support</div>
+                    <div style="margin: 10px 0;">✅ Priority updates</div>
+                    <div style="margin: 10px 0;">✅ Dedicated contact</div>
+                </div>
+                
+                <button class="btn" onclick="contactEnterprise()" style="width: 100%; margin-top: 20px; background: rgba(255, 255, 0, 0.2); border-color: #ff0; color: #ff0;">
+                    📧 CONTACT SALES
+                </button>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding: 20px; border-top: 1px solid #0f0;">
+            <p style="opacity: 0.8; margin-bottom: 10px;">
+                Want to run YOUR OWN tournament empire with YOUR token?
+            </p>
+            <p style="font-size: 12px; opacity: 0.6;">
+                Payment via Stripe, PayPal, or Crypto. Instant delivery.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add these functions to your existing JavaScript
+
+function showUpgradeModal() {
+    document.getElementById('upgrade-modal').style.display = 'block';
+    log('Showing upgrade options', 'info');
+}
+
+function closeUpgradeModal() {
+    document.getElementById('upgrade-modal').style.display = 'none';
+}
+
+function purchaseSourceCode() {
+    // In production, redirect to payment page
+    const paymentUrl = 'https://your-payment-page.com/source-code';
+    
+    log('Redirecting to purchase page...', 'info');
+    
+    // For now, show alert
+    alert('Source Code Package: $500\n\nYou will be redirected to the payment page.\n\nAfter purchase, you will receive:\n- Complete source code\n- License key\n- Setup instructions\n- Email support access');
+    
+    // Uncomment in production:
+    // window.open(paymentUrl, '_blank');
+}
+
+function contactEnterprise() {
+    const email = 'sales@asx-gaming.com';
+    const subject = encodeURIComponent('Enterprise Package Inquiry');
+    const body = encodeURIComponent('Hi,\n\nI am interested in the Enterprise Package ($10,000).\n\nMy requirements:\n- [Describe your needs]\n\nPlease contact me to discuss.\n\nThank you!');
+    
+    log('Opening email client...', 'info');
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+// Auto-show upgrade prompt after 5 minutes of use
+setTimeout(() => {
+    if (Math.random() < 0.3) { // 30% chance
+        showUpgradeModal();
+    }
+}, 300000); // 5 minutes
+
+// Show upgrade on certain actions
+function triggerUpgradePrompt() {
+    // Show when user tries to do something limited
+    const licenseType = 'free'; // Get from API
+    
+    if (licenseType === 'free') {
+        showUpgradeModal();
+        return false;
+    }
+    return true;
+}
+</script>

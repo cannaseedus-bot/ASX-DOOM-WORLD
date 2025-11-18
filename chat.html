@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Asset Builder - Complete System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 20px;
+            border-bottom: 2px solid #00ff00;
+            background: rgba(0, 20, 0, 0.95);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            text-shadow: 0 0 15px #00ff00;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+        }
+        
+        .btn:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .btn.admin {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+        
+        .chat-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 350px;
+            background: rgba(0, 20, 0, 0.95);
+            border-right: 2px solid #00ff00;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .sidebar h2 { margin-bottom: 15px; text-shadow: 0 0 10px #00ff00; }
+        .sidebar h3 { margin: 20px 0 10px; color: #00ff00; text-shadow: 0 0 5px #00ff00; }
+        .sidebar ul { list-style: none; padding-left: 0; }
+        .sidebar li { padding: 5px 0; color: #00cc00; padding-left: 20px; position: relative; }
+        .sidebar li:before { content: ">"; position: absolute; left: 0; color: #00ff00; }
+        
+        .example-box {
+            background: rgba(0, 40, 0, 0.5);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-box:hover {
+            background: rgba(0, 60, 0, 0.7);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 10, 0, 0.5);
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .message.bot .message-header { color: #00ff00; }
+        .message.user .message-header { color: #00ffff; }
+        .message.system .message-header { color: #ffff00; }
+        
+        .message-content {
+            background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            line-height: 1.6;
+            color: #00cc00;
+        }
+        
+        .message.user .message-content {
+            border-color: #00ffff;
+            background: rgba(0, 20, 20, 0.8);
+        }
+        
+        .message.system .message-content {
+            border-color: #ffff00;
+            background: rgba(20, 20, 0, 0.8);
+            color: #ffff00;
+        }
+        
+        .message-content pre {
+            background: rgba(0, 40, 0, 0.8);
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            padding: 10px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .copy-btn {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .input-area {
+            border-top: 2px solid #00ff00;
+            background: rgba(0, 20, 0, 0.95);
+            padding: 20px;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            background: rgba(0, 40, 0, 0.8);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            resize: none;
+            min-height: 80px;
+        }
+        
+        #user-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        #user-input::placeholder { color: #00cc00; }
+        
+        .send-btn {
+            padding: 15px 30px;
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            background: rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quick-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            padding: 8px 15px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-btn:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        
+        .modal.show { display: flex; }
+        
+        .modal-content {
+            background: rgba(0, 20, 0, 0.98);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.7);
+            margin: 20px;
+        }
+        
+        .modal-content h2 { margin-bottom: 20px; text-shadow: 0 0 15px #00ff00; }
+        .modal-content h3 { margin: 25px 0 15px; color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+        
+        .form-group { margin-bottom: 20px; }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 40, 0, 0.8);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn.primary { background: rgba(0, 255, 0, 0.2); color: #00ff00; }
+        .modal-btn.secondary { background: rgba(0, 255, 0, 0.1); color: #00ff00; }
+        
+        .modal-btn:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.active {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .status-indicator.inactive { background: #666666; }
+        
+        .api-status {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0, 40, 0, 0.5);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .api-status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-role {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 0, 0.2);
+            border: 1px solid #ffff00;
+            border-radius: 3px;
+            color: #ffff00;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #00ff00; border-radius: 5px; }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .header h1 { font-size: 1.2em; }
+            .modal-content { width: 95%; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI ASSET BUILDER <span id="user-role-badge"></span></h1>
+            <div class="header-buttons">
+                <button class="btn admin" id="admin-btn" onclick="showAdminPanel()" style="display:none;">⚙️ ADMIN</button>
+                <a href="main-index.html" class="btn">← BACK</a>
+            </div>
+        </div>
+        
+        <div class="chat-layout">
+            <div class="sidebar">
+                <h2>📋 ASX GUIDE</h2>
+                
+                <h3>Quick Start:</h3>
+                <ul>
+                    <li>Describe your 3D asset</li>
+                    <li>AI asks clarifying questions</li>
+                    <li>Receive complete ASX JSON</li>
+                    <li>Copy & run in browser</li>
+                </ul>
+                
+                <h3>Example Prompts:</h3>
+                <div class="example-box" onclick="quickPrompt('Create a glowing magic sword that rotates')">
+                    "Create a glowing magic sword"
+                </div>
+                <div class="example-box" onclick="quickPrompt('Make a treasure chest that opens')">
+                    "Make an opening treasure chest"
+                </div>
+                <div class="example-box" onclick="quickPrompt('Build a sci-fi control panel')">
+                    "Build a sci-fi control panel"
+                </div>
+                
+                <h3>Resources:</h3>
+                <ul>
+                    <li><a href="https://github.com/mpickettpayments-hue/JSON-ASX" target="_blank" style="color: #00ff00;">ASX Spec</a></li>
+                    <li><a href="https://github.com/mpickettpayments-hue/json-asx-cdn" target="_blank" style="color: #00ff00;">ASX CDN</a></li>
+                </ul>
+            </div>
+            
+            <div class="chat-container">
+                <div class="messages" id="messages">
+                    <div class="message system">
+                        <div class="message-header">SYSTEM</div>
+                        <div class="message-content">
+                            <p><strong>Welcome to ASX Model Builder!</strong></p>
+                            <p style="margin-top: 10px;">I help you create Three.js game assets using ASX JSON.</p>
+                            <p style="margin-top: 10px;"><strong>Status:</strong> <span id="llm-status">Demo Mode</span></p>
+                            <p style="margin-top: 10px;"><em>💡 First user to login becomes admin!</em></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <textarea id="user-input" placeholder="Describe your 3D asset..."></textarea>
+                        <button class="send-btn" id="send-btn" onclick="sendMessage()">SEND ⚡</button>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="quickPrompt('Metallic rotating cube')">⚡ Cube</button>
+                        <button class="quick-btn" onclick="quickPrompt('Glowing pulsing sphere')">⚡ Sphere</button>
+                        <button class="quick-btn" onclick="quickPrompt('Simple character model')">⚡ Character</button>
+                        <button class="quick-btn" onclick="showUserGuide()">📖 Guide</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin Modal -->
+    <div class="modal" id="admin-modal">
+        <div class="modal-content">
+            <h2>⚙️ ADMIN CONTROL PANEL</h2>
+            
+            <div class="api-status">
+                <h3 style="margin: 0 0 10px 0;">User Information</h3>
+                <div class="api-status-item">
+                    <span>User:</span>
+                    <strong id="user-id-display">Not logged in</strong>
+                </div>
+                <div class="api-status-item">
+                    <span>Role:</span>
+                    <strong id="user-role-display">Guest</strong>
+                </div>
+                <div class="api-status-item">
+                    <span>Login:</span>
+                    <button class="btn" onclick="googleLogin()" id="login-btn">🔐 Google Login</button>
+                </div>
+            </div>
+            
+            <h3>API Status</h3>
+            <div class="api-status" id="api-status-display"></div>
+            
+            <h3>🤖 AI/LLM Providers</h3>
+            <div class="form-group">
+                <label>OpenAI Key</label>
+                <input type="password" id="openai-key" placeholder="sk-...">
+            </div>
+            
+            <div class="form-group">
+                <label>Claude Key</label>
+                <input type="password" id="claude-key" placeholder="sk-ant-...">
+            </div>
+            
+            <div class="form-group">
+                <label>Ollama URL</label>
+                <input type="text" id="ollama-url" placeholder="http://localhost:11434" value="http://localhost:11434">
+            </div>
+            
+            <div class="form-group">
+                <label>Active LLM</label>
+                <select id="active-llm">
+                    <option value="demo">Demo Mode</option>
+                    <option value="openai">OpenAI GPT-4</option>
+                    <option value="claude">Claude</option>
+                    <option value="ollama">Ollama Local</option>
+                </select>
+            </div>
+            
+            <h3>💳 Payments</h3>
+            <div class="form-group">
+                <label>Stripe Key</label>
+                <input type="password" id="stripe-key" placeholder="sk_test_...">
+            </div>
+            
+            <div class="form-group">
+                <label>Coinbase Key</label>
+                <input type="password" id="coinbase-key" placeholder="API Key">
+            </div>
+            
+            <h3>📚 ASX Learning</h3>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="enable-asx-learning" style="width: auto;">
+                    Enable ASX Learning Mode
+                </label>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="saveAdminSettings()">💾 SAVE</button>
+                <button class="modal-btn secondary" onclick="closeAdminPanel()">✕ CANCEL</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Guide Modal -->
+    <div class="modal" id="guide-modal">
+        <div class="modal-content">
+            <h2>📖 ASX USER GUIDE</h2>
+            <p style="color: #00cc00; line-height: 1.6;">ASX (Asset Scene eXchange) is a Three.js JSON format for 3D scenes.</p>
+            
+            <h3>Resources</h3>
+            <ul style="color: #00cc00; line-height: 1.8;">
+                <li><a href="https://github.com/mpickettpayments-hue/JSON-ASX" target="_blank" style="color: #00ff00;">Full Specification</a></li>
+                <li><a href="https://github.com/mpickettpayments-hue/json-asx-cdn" target="_blank" style="color: #00ff00;">Gaming Engine Code</a></li>
+            </ul>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="closeUserGuide()">✓ GOT IT</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        const drops = Array(Math.floor(canvas.width / 14)).fill(1);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '14px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 14, drops[i] * 14);
+                if (drops[i] * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+        
+        // State
+        let currentUser = JSON.parse(localStorage.getItem('asx_user')) || null;
+        let adminSettings = JSON.parse(localStorage.getItem('asx_admin_settings')) || {
+            openai_key: '', claude_key: '', ollama_url: 'http://localhost:11434',
+            active_llm: 'demo', stripe_key: '', coinbase_key: '',
+            enable_asx_learning: true
+        };
+        let conversationHistory = [];
+        
+        const ASX_PROMPT = `You are an ASX JSON game asset creator. Generate complete Three.js HTML files with CDN links, scene setup, and ASX JSON data. Always ask clarifying questions first.`;
+        
+        function init() {
+            updateUserDisplay();
+            updateLLMStatus();
+        }
+        
+        function updateUserDisplay() {
+            const badge = document.getElementById('user-role-badge');
+            const btn = document.getElementById('admin-btn');
+            if (currentUser) {
+                badge.innerHTML = `<span class="user-role">${currentUser.role.toUpperCase()}</span>`;
+                btn.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+            }
+        }
+        
+        function googleLogin() {
+            currentUser = {
+                id: 'user_' + Date.now(),
+                email: 'demo@example.com',
+                role: currentUser ? 'user' : 'admin',
+                created_at: new Date().toISOString()
+            };
+            localStorage.setItem('asx_user', JSON.stringify(currentUser));
+            updateUserDisplay();
+            updateAdminDisplay();
+            addMessage('system', `✓ Logged in as ${currentUser.role.toUpperCase()}`);
+        }
+        
+        function showAdminPanel() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Admin access required');
+                return;
+            }
+            document.getElementById('admin-modal').classList.add('show');
+            loadAdminSettings();
+            updateAdminDisplay();
+        }
+        
+        function closeAdminPanel() {
+            document.getElementById('admin-modal').classList.remove('show');
+        }
+        
+        function loadAdminSettings() {
+            document.getElementById('openai-key').value = adminSettings.openai_key || '';
+            document.getElementById('claude-key').value = adminSettings.claude_key || '';
+            document.getElementById('ollama-url').value = adminSettings.ollama_url || '';
+            document.getElementById('active-llm').value = adminSettings.active_llm || 'demo';
+            document.getElementById('stripe-key').value = adminSettings.stripe_key || '';
+            document.getElementById('coinbase-key').value = adminSettings.coinbase_key || '';
+            document.getElementById('enable-asx-learning').checked = adminSettings.enable_asx_learning !== false;
+        }
+        
+        function saveAdminSettings() {
+            adminSettings = {
+                openai_key: document.getElementById('openai-key').value,
+                claude_key: document.getElementById('claude-key').value,
+                ollama_url: document.getElementById('ollama-url').value,
+                active_llm: document.getElementById('active-llm').value,
+                stripe_key: document.getElementById('stripe-key').value,
+                coinbase_key: document.getElementById('coinbase-key').value,
+                enable_asx_learning: document.getElementById('enable-asx-learning').checked
+            };
+            localStorage.setItem('asx_admin_settings', JSON.stringify(adminSettings));
+            updateLLMStatus();
+            updateAPIStatus();
+            addMessage('system', '✓ Settings saved!');
+            closeAdminPanel();
+        }
+        
+        function updateAdminDisplay() {
+            if (!currentUser) return;
+            document.getElementById('user-id-display').textContent = currentUser.id;
+            document.getElementById('user-role-display').textContent = currentUser.role.toUpperCase();
+            document.getElementById('login-btn').textContent = '✓ ' + currentUser.email;
+        }
+        
+        function updateAPIStatus() {
+            const html = `
+                <div class="api-status-item"><span>OpenAI</span><span><span class="status-indicator ${adminSettings.openai_key ? 'active' : 'inactive'}"></span>${adminSettings.openai_key ? 'Active' : 'Not Set'}</span></div>
+                <div class="api-status-item"><span>Claude</span><span><span class="status-indicator ${adminSettings.claude_key ? 'active' : 'inactive'}"></span>${adminSettings.claude_key ? 'Active' : 'Not Set'}</span></div>
+                <div class="api-status-item"><span>Ollama</span><span><span class="status-indicator ${adminSettings.ollama_url ? 'active' : 'inactive'}"></span>${adminSettings.ollama_url ? 'Ready' : 'Not Set'}</span></div>
+                <div class="api-status-item"><span>Stripe</span><span><span class="status-indicator ${adminSettings.stripe_key ? 'active' : 'inactive'}"></span>${adminSettings.stripe_key ? 'Active' : 'Not Set'}</span></div>
+                <div class="api-status-item"><span>Coinbase</span><span><span class="status-indicator ${adminSettings.coinbase_key ? 'active' : 'inactive'}"></span>${adminSettings.coinbase_key ? 'Active' : 'Not Set'}</span></div>
+            `;
+            const el = document.getElementById('api-status-display');
+            if (el) el.innerHTML = html;
+        }
+        
+        function updateLLMStatus() {
+            const el = document.getElementById('llm-status');
+            if (!el) return;
+            let status = 'Demo Mode';
+            if (adminSettings.active_llm === 'openai' && adminSettings.openai_key) status = '✓ OpenAI Active';
+            else if (adminSettings.active_llm === 'claude' && adminSettings.claude_key) status = '✓ Claude Active';
+            else if (adminSettings.active_llm === 'ollama') status = '✓ Ollama Local';
+            el.textContent = status;
+        }
+        
+        function showUserGuide() {
+            document.getElementById('guide-modal').classList.add('show');
+        }
+        
+        function closeUserGuide() {
+            document.getElementById('guide-modal').classList.remove('show');
+        }
+        
+        function addMessage(role, content) {
+            const div = document.getElementById('messages');
+            const msg = document.createElement('div');
+            msg.className = `message ${role}`;
+            msg.innerHTML = `<div class="message-header">${role.toUpperCase()}</div><div class="message-content">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
+            div.appendChild(msg);
+            div.scrollTop = div.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function copyCode(btn) {
+            const code = btn.previousElementSibling.textContent;
+            navigator.clipboard.writeText(code);
+            btn.textContent = '✓ COPIED!';
+            setTimeout(() => btn.textContent = '📋 COPY', 2000);
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            
+            input.value = '';
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+            btn.textContent = 'THINKING...';
+            
+            addMessage('user', msg);
+            conversationHistory.push({role: 'user', content: msg});
+            
+            await simulateResponse(msg);
+            
+            btn.disabled = false;
+            btn.textContent = 'SEND ⚡';
+        }
+        
+        async function simulateResponse(msg) {
+            await new Promise(r => setTimeout(r, 1000));
+            const response = msg.toLowerCase().includes('cube') ? 
+                'Great! What size cube? Provide width, height, depth in meters.' :
+                'Hello! Describe your 3D asset and I\'ll help you create it using ASX JSON format.';
+            conversationHistory.push({role: 'assistant', content: response});
+            addMessage('bot', response);
+        }
+        
+        function quickPrompt(prompt) {
+            document.getElementById('user-input').value = prompt;
+            sendMessage();
+        }
+        
+        document.getElementById('user-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        init();
+    </script>
+</body>
+</html>

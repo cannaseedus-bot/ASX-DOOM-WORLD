@@ -1,0 +1,39 @@
+{
+  "name": "asx-doom-json-server",
+  "version": "1.0.0",
+  "description": "ASX DOOM Tournament Server - Multi-server JSON management with Ollama integration and DOOM multiplayer",
+  "main": "server.js",
+  "bin": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "node build.js",
+    "build:exe": "pkg . --targets node18-win-x64 --output dist/asx-doom-server.exe",
+    "build:all": "pkg . --targets node18-win-x64,node18-macos-x64,node18-linux-x64"
+  },
+  "keywords": ["json-server", "doom", "gaming", "ollama", "marketplace", "tournaments", "asx", "token"],
+  "author": "ASX Gaming",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "dependencies": {
+    "json-server": "^0.17.4",
+    "ws": "^8.14.2",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "targets": ["node18-win-x64"],
+    "assets": [
+      "public/**/*",
+      "modules/**/*",
+      "config.json"
+    ],
+    "outputPath": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/asx-doom-server"
+  }
+}
