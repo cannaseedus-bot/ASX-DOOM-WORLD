@@ -1,0 +1,430 @@
+{
+  "template": {
+    "id": "arena_circular",
+    "name": "Circular Arena",
+    "author": "ASX Interactive Systems",
+    "version": "1.0",
+    "description": "Classic circular deathmatch arena with central platform, outer ring, weapon spawns, and hellscape aesthetic",
+    "metadata": {
+      "size": "100x100",
+      "playerCount": "4-8",
+      "difficulty": "Easy",
+      "theme": "hellscape",
+      "playTime": "5-10 minutes"
+    }
+  },
+  "terrain": {
+    "type": "circular_platform",
+    "geometry": {
+      "outerRadius": 50,
+      "innerRadius": 5,
+      "height": 0.5,
+      "segments": 64,
+      "rings": 4
+    },
+    "textures": {
+      "floor": {
+        "diffuse": "textures/stone_floor_red.jpg",
+        "normal": "textures/stone_floor_normal.jpg",
+        "roughness": 0.8,
+        "metalness": 0.1,
+        "scale": [10, 10]
+      },
+      "center": {
+        "diffuse": "textures/pentagram_floor.jpg",
+        "emissive": "#330000",
+        "emissiveIntensity": 0.5
+      }
+    },
+    "levels": [
+      {
+        "name": "outer_ring",
+        "radius": 45,
+        "elevation": 0
+      },
+      {
+        "name": "mid_ring",
+        "radius": 25,
+        "elevation": 1
+      },
+      {
+        "name": "center_platform",
+        "radius": 10,
+        "elevation": 3
+      }
+    ],
+    "ramps": [
+      {"from": "outer_ring", "to": "mid_ring", "angle": 0},
+      {"from": "outer_ring", "to": "mid_ring", "angle": 90},
+      {"from": "outer_ring", "to": "mid_ring", "angle": 180},
+      {"from": "outer_ring", "to": "mid_ring", "angle": 270},
+      {"from": "mid_ring", "to": "center_platform", "angle": 45},
+      {"from": "mid_ring", "to": "center_platform", "angle": 135},
+      {"from": "mid_ring", "to": "center_platform", "angle": 225},
+      {"from": "mid_ring", "to": "center_platform", "angle": 315}
+    ]
+  },
+  "architecture": {
+    "walls": [
+      {
+        "type": "outer_wall",
+        "shape": "circle",
+        "radius": 52,
+        "height": 8,
+        "thickness": 2,
+        "texture": "textures/stone_wall_hell.jpg",
+        "collision": true
+      }
+    ],
+    "pillars": [
+      {
+        "position": {"x": 35, "y": 0, "z": 0},
+        "model": "models/pillar_gothic.glb",
+        "scale": 1.5
+      },
+      {
+        "position": {"x": -35, "y": 0, "z": 0},
+        "model": "models/pillar_gothic.glb",
+        "scale": 1.5
+      },
+      {
+        "position": {"x": 0, "y": 0, "z": 35},
+        "model": "models/pillar_gothic.glb",
+        "scale": 1.5
+      },
+      {
+        "position": {"x": 0, "y": 0, "z": -35},
+        "model": "models/pillar_gothic.glb",
+        "scale": 1.5
+      }
+    ],
+    "decorations": [
+      {
+        "type": "torch",
+        "positions": [
+          {"x": 40, "y": 2, "z": 0},
+          {"x": -40, "y": 2, "z": 0},
+          {"x": 0, "y": 2, "z": 40},
+          {"x": 0, "y": 2, "z": -40},
+          {"x": 28, "y": 2, "z": 28},
+          {"x": -28, "y": 2, "z": 28},
+          {"x": 28, "y": 2, "z": -28},
+          {"x": -28, "y": 2, "z": -28}
+        ],
+        "model": "models/torch_wall.glb",
+        "light": {
+          "color": "#ff4400",
+          "intensity": 2,
+          "distance": 10,
+          "flicker": true
+        }
+      },
+      {
+        "type": "skull_pile",
+        "positions": [
+          {"x": 45, "y": 0.5, "z": 10},
+          {"x": 45, "y": 0.5, "z": -10},
+          {"x": -45, "y": 0.5, "z": 10},
+          {"x": -45, "y": 0.5, "z": -10}
+        ],
+        "model": "models/skull_pile.glb",
+        "randomRotation": true
+      }
+    ]
+  },
+  "spawns": {
+    "player": [
+      {
+        "id": "spawn_1",
+        "position": {"x": 40, "y": 0.5, "z": 0},
+        "rotation": {"x": 0, "y": 180, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_2",
+        "position": {"x": -40, "y": 0.5, "z": 0},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_3",
+        "position": {"x": 0, "y": 0.5, "z": 40},
+        "rotation": {"x": 0, "y": 270, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_4",
+        "position": {"x": 0, "y": 0.5, "z": -40},
+        "rotation": {"x": 0, "y": 90, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_5",
+        "position": {"x": 28, "y": 0.5, "z": 28},
+        "rotation": {"x": 0, "y": 225, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_6",
+        "position": {"x": -28, "y": 0.5, "z": 28},
+        "rotation": {"x": 0, "y": 315, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_7",
+        "position": {"x": 28, "y": 0.5, "z": -28},
+        "rotation": {"x": 0, "y": 135, "z": 0},
+        "weapon": "pistol"
+      },
+      {
+        "id": "spawn_8",
+        "position": {"x": -28, "y": 0.5, "z": -28},
+        "rotation": {"x": 0, "y": 45, "z": 0},
+        "weapon": "pistol"
+      }
+    ]
+  },
+  "items": {
+    "weapons": [
+      {
+        "type": "shotgun",
+        "position": {"x": 35, "y": 1.5, "z": 0},
+        "respawnTime": 30,
+        "model": "models/weapons/shotgun.glb"
+      },
+      {
+        "type": "shotgun",
+        "position": {"x": -35, "y": 1.5, "z": 0},
+        "respawnTime": 30,
+        "model": "models/weapons/shotgun.glb"
+      },
+      {
+        "type": "chaingun",
+        "position": {"x": 0, "y": 1.5, "z": 35},
+        "respawnTime": 45,
+        "model": "models/weapons/chaingun.glb"
+      },
+      {
+        "type": "rocket_launcher",
+        "position": {"x": 0, "y": 4, "z": 0},
+        "respawnTime": 60,
+        "model": "models/weapons/rocket_launcher.glb",
+        "highlight": true
+      }
+    ],
+    "health": [
+      {
+        "type": "health_small",
+        "positions": [
+          {"x": 20, "y": 1.5, "z": 0},
+          {"x": -20, "y": 1.5, "z": 0},
+          {"x": 0, "y": 1.5, "z": 20},
+          {"x": 0, "y": 1.5, "z": -20}
+        ],
+        "respawnTime": 20,
+        "amount": 25
+      },
+      {
+        "type": "health_large",
+        "positions": [
+          {"x": 15, "y": 1.5, "z": 15},
+          {"x": -15, "y": 1.5, "z": -15}
+        ],
+        "respawnTime": 40,
+        "amount": 50
+      }
+    ],
+    "armor": [
+      {
+        "type": "armor_bonus",
+        "positions": [
+          {"x": 12, "y": 1.5, "z": 12},
+          {"x": -12, "y": 1.5, "z": 12},
+          {"x": 12, "y": 1.5, "z": -12},
+          {"x": -12, "y": 1.5, "z": -12}
+        ],
+        "respawnTime": 20,
+        "amount": 1
+      },
+      {
+        "type": "armor_green",
+        "position": {"x": 0, "y": 0.5, "z": -35},
+        "respawnTime": 60,
+        "amount": 100
+      }
+    ],
+    "ammo": [
+      {
+        "type": "ammo_shells",
+        "positions": [
+          {"x": 30, "y": 1.5, "z": 10},
+          {"x": 30, "y": 1.5, "z": -10},
+          {"x": -30, "y": 1.5, "z": 10},
+          {"x": -30, "y": 1.5, "z": -10}
+        ],
+        "respawnTime": 25
+      },
+      {
+        "type": "ammo_bullets",
+        "positions": [
+          {"x": 10, "y": 1.5, "z": 30},
+          {"x": -10, "y": 1.5, "z": 30}
+        ],
+        "respawnTime": 25
+      },
+      {
+        "type": "ammo_rockets",
+        "positions": [
+          {"x": 5, "y": 4, "z": 5},
+          {"x": -5, "y": 4, "z": -5}
+        ],
+        "respawnTime": 40
+      }
+    ]
+  },
+  "lighting": {
+    "ambient": {
+      "color": "#330000",
+      "intensity": 0.3
+    },
+    "directional": {
+      "color": "#ff0000",
+      "intensity": 0.7,
+      "position": {"x": 0, "y": 100, "z": 0},
+      "target": {"x": 0, "y": 0, "z": 0},
+      "castShadow": true,
+      "shadow": {
+        "mapSize": 2048,
+        "camera": {
+          "near": 1,
+          "far": 200,
+          "left": -60,
+          "right": 60,
+          "top": 60,
+          "bottom": -60
+        }
+      }
+    },
+    "point": [
+      {
+        "position": {"x": 0, "y": 5, "z": 0},
+        "color": "#ff0000",
+        "intensity": 5,
+        "distance": 40,
+        "decay": 2,
+        "castShadow": false
+      }
+    ],
+    "hemisphere": {
+      "skyColor": "#440000",
+      "groundColor": "#110000",
+      "intensity": 0.5
+    }
+  },
+  "particles": {
+    "embers": {
+      "position": {"x": 0, "y": 0, "z": 0},
+      "area": {"type": "circle", "radius": 45},
+      "count": 500,
+      "lifetime": 5,
+      "speed": 0.5,
+      "gravity": -0.1,
+      "texture": "textures/particles/ember.png",
+      "color": "#ff4400",
+      "size": 0.3,
+      "opacity": 0.6
+    },
+    "smoke": {
+      "position": {"x": 0, "y": 0, "z": 0},
+      "area": {"type": "circle", "radius": 40},
+      "count": 200,
+      "lifetime": 8,
+      "speed": 0.2,
+      "gravity": 0.1,
+      "texture": "textures/particles/smoke.png",
+      "color": "#331100",
+      "size": 2,
+      "opacity": 0.3
+    }
+  },
+  "atmosphere": {
+    "fog": {
+      "color": "#440000",
+      "near": 20,
+      "far": 60,
+      "density": 0.01
+    },
+    "skybox": {
+      "type": "hellscape",
+      "textures": [
+        "textures/skybox/hell_px.jpg",
+        "textures/skybox/hell_nx.jpg",
+        "textures/skybox/hell_py.jpg",
+        "textures/skybox/hell_ny.jpg",
+        "textures/skybox/hell_pz.jpg",
+        "textures/skybox/hell_nz.jpg"
+      ]
+    }
+  },
+  "gameplay": {
+    "gamemode": "deathmatch",
+    "fraglimit": 25,
+    "timelimit": 10,
+    "respawnTime": 5,
+    "weaponStay": false,
+    "powerups": {
+      "quad_damage": {
+        "enabled": true,
+        "position": {"x": 0, "y": 4, "z": 0},
+        "respawnTime": 120
+      },
+      "invisibility": {
+        "enabled": true,
+        "position": {"x": 48, "y": 0.5, "z": 0},
+        "respawnTime": 180
+      }
+    }
+  },
+  "audio": {
+    "ambient": {
+      "track": "sounds/ambient/hell_wind.ogg",
+      "volume": 0.3,
+      "loop": true
+    },
+    "music": {
+      "track": "sounds/music/arena_combat.ogg",
+      "volume": 0.5,
+      "loop": true
+    },
+    "effects": {
+      "fire": {
+        "sound": "sounds/effects/fire_loop.ogg",
+        "volume": 0.2,
+        "positions": [
+          {"x": 40, "y": 2, "z": 0},
+          {"x": -40, "y": 2, "z": 0},
+          {"x": 0, "y": 2, "z": 40},
+          {"x": 0, "y": 2, "z": -40}
+        ]
+      }
+    }
+  },
+  "optimization": {
+    "lod": {
+      "enabled": true,
+      "levels": [
+        {"distance": 0, "quality": "high"},
+        {"distance": 30, "quality": "medium"},
+        {"distance": 60, "quality": "low"}
+      ]
+    },
+    "culling": {
+      "frustum": true,
+      "occlusion": true
+    },
+    "shadows": {
+      "static": "baked",
+      "dynamic": "realtime"
+    }
+  }
+}

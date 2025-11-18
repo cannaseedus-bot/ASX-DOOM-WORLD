@@ -1,0 +1,630 @@
+{
+  "template": {
+    "id": "cathedral",
+    "name": "Corrupted Cathedral",
+    "author": "ASX Interactive Systems",
+    "version": "1.0",
+    "description": "Gothic cathedral overrun by demons. Vertical gameplay with balconies, stained glass, confessionals, and a cursed altar. Perfect for single-player campaigns or co-op horror.",
+    "metadata": {
+      "size": "300x200x25 (w x d x h)",
+      "playerCount": "1-4 (co-op) or 8-12 (deathmatch)",
+      "difficulty": "Medium",
+      "theme": "gothic_horror",
+      "playTime": "15-20 minutes",
+      "secrets": 5
+    }
+  },
+  "terrain": {
+    "type": "interior_floor",
+    "geometry": {
+      "shape": "cross",
+      "width": 300,
+      "depth": 200,
+      "segments": 100
+    },
+    "textures": {
+      "floor": {
+        "main": {
+          "diffuse": "textures/stone_floor_cathedral.jpg",
+          "normal": "textures/stone_floor_normal.jpg",
+          "roughness": 0.7,
+          "scale": [20, 20]
+        },
+        "blood_overlay": {
+          "diffuse": "textures/blood_splatter_floor.png",
+          "blend": "multiply",
+          "opacity": 0.6,
+          "positions": [
+            {"x": -50, "z": 0, "rotation": 45},
+            {"x": 30, "z": 60, "rotation": 120},
+            {"x": -70, "z": -40, "rotation": 270}
+          ]
+        }
+      }
+    },
+    "areas": {
+      "nave": {
+        "bounds": {"x": 0, "z": 0, "width": 60, "depth": 180},
+        "floor": "stone_main"
+      },
+      "transept": {
+        "bounds": {"x": -100, "z": 60, "width": 200, "depth": 40},
+        "floor": "stone_checkered"
+      },
+      "apse": {
+        "bounds": {"x": 0, "z": 100, "width": 60, "depth": 40},
+        "floor": "marble_bloody",
+        "elevation": 2
+      },
+      "crypt_entrance": {
+        "bounds": {"x": 0, "z": -80, "width": 20, "depth": 20},
+        "floor": "stone_dark",
+        "stairway_down": true
+      }
+    }
+  },
+  "architecture": {
+    "walls": {
+      "outer_walls": {
+        "height": 25,
+        "thickness": 3,
+        "texture": "textures/stone_wall_gothic.jpg",
+        "windows": [
+          {
+            "position": {"x": -28, "y": 12, "z": 30},
+            "type": "stained_glass",
+            "width": 6,
+            "height": 15,
+            "texture": "textures/stained_glass_red.png",
+            "light": {"color": "#880000", "intensity": 2}
+          },
+          {
+            "position": {"x": 28, "y": 12, "z": 30},
+            "type": "stained_glass",
+            "width": 6,
+            "height": 15,
+            "texture": "textures/stained_glass_blue.png",
+            "light": {"color": "#000088", "intensity": 1.5}
+          },
+          {
+            "position": {"x": -28, "y": 12, "z": 70},
+            "type": "stained_glass",
+            "width": 6,
+            "height": 15,
+            "texture": "textures/stained_glass_purple.png",
+            "light": {"color": "#440044", "intensity": 1.5}
+          },
+          {
+            "position": {"x": 28, "y": 12, "z": 70},
+            "type": "stained_glass",
+            "width": 6,
+            "height": 15,
+            "texture": "textures/stained_glass_corrupted.png",
+            "light": {"color": "#440000", "intensity": 2, "flicker": true}
+          }
+        ]
+      },
+      "interior_walls": {
+        "confessionals": [
+          {
+            "position": {"x": -25, "y": 0, "z": 10},
+            "model": "models/confessional.glb",
+            "door": {"locked": false, "secret": "ammo_cache"}
+          },
+          {
+            "position": {"x": 25, "y": 0, "z": 10},
+            "model": "models/confessional.glb",
+            "door": {"locked": true, "key": "red_skull"}
+          },
+          {
+            "position": {"x": -25, "y": 0, "z": 50},
+            "model": "models/confessional.glb",
+            "door": {"locked": false}
+          },
+          {
+            "position": {"x": 25, "y": 0, "z": 50},
+            "model": "models/confessional.glb",
+            "door": {"locked": false, "secret": "armor_cache"}
+          }
+        ]
+      }
+    },
+    "ceiling": {
+      "type": "vaulted",
+      "height": 25,
+      "arches": 8,
+      "texture": "textures/stone_ceiling_detailed.jpg",
+      "paintings": [
+        {
+          "position": {"x": 0, "z": 40},
+          "texture": "textures/ceiling_painting_heaven.jpg",
+          "corrupted": true,
+          "blood_drip": true
+        }
+      ]
+    },
+    "pillars": [
+      {
+        "type": "gothic_column",
+        "positions": [
+          {"x": -20, "y": 0, "z": 0},
+          {"x": 20, "y": 0, "z": 0},
+          {"x": -20, "y": 0, "z": 40},
+          {"x": 20, "y": 0, "z": 40},
+          {"x": -20, "y": 0, "z": 80},
+          {"x": 20, "y": 0, "z": 80}
+        ],
+        "height": 20,
+        "radius": 2,
+        "model": "models/pillar_gothic_tall.glb"
+      }
+    ],
+    "altar": {
+      "position": {"x": 0, "y": 2, "z": 110},
+      "model": "models/altar_corrupted.glb",
+      "scale": 2,
+      "interaction": {
+        "type": "boss_trigger",
+        "message": "The altar trembles with unholy power...",
+        "spawn": "baron_of_hell"
+      },
+      "effects": {
+        "particles": "demonic_energy",
+        "light": {"color": "#ff0000", "intensity": 3, "pulsate": true},
+        "sound": "sounds/ambient/evil_chant.ogg"
+      }
+    },
+    "pews": {
+      "rows": 10,
+      "perRow": 6,
+      "spacing": 8,
+      "startPosition": {"x": -15, "y": 0, "z": -40},
+      "model": "models/pew_wooden.glb",
+      "state": "destroyed",
+      "debris": true
+    },
+    "balconies": {
+      "choir_loft": {
+        "position": {"x": 0, "y": 12, "z": -70},
+        "width": 40,
+        "depth": 15,
+        "railing": true,
+        "access": "stairway_west",
+        "items": ["shotgun", "ammo_shells", "health_large"]
+      },
+      "organ_loft": {
+        "position": {"x": 0, "y": 15, "z": -75},
+        "width": 20,
+        "depth": 10,
+        "model": "models/pipe_organ_corrupted.glb",
+        "interaction": {
+          "type": "sound_trigger",
+          "sound": "sounds/effects/organ_demonic.ogg"
+        }
+      },
+      "side_balconies": [
+        {
+          "position": {"x": -30, "y": 8, "z": 40},
+          "width": 30,
+          "depth": 8,
+          "access": "ladder_west",
+          "enemies": ["imp", "imp"]
+        },
+        {
+          "position": {"x": 30, "y": 8, "z": 40},
+          "width": 30,
+          "depth": 8,
+          "access": "ladder_east",
+          "enemies": ["demon"]
+        }
+      ]
+    }
+  },
+  "spawns": {
+    "player": [
+      {
+        "id": "spawn_main",
+        "position": {"x": 0, "y": 0, "z": -90},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "weapon": "pistol",
+        "difficulty": [1, 2, 3, 4, 5]
+      },
+      {
+        "id": "spawn_coop_1",
+        "position": {"x": -5, "y": 0, "z": -90},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "weapon": "pistol",
+        "coop_only": true
+      },
+      {
+        "id": "spawn_coop_2",
+        "position": {"x": 5, "y": 0, "z": -90},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "weapon": "pistol",
+        "coop_only": true
+      },
+      {
+        "id": "spawn_coop_3",
+        "position": {"x": -10, "y": 0, "z": -85},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "weapon": "pistol",
+        "coop_only": true
+      }
+    ]
+  },
+  "enemies": {
+    "waves": [
+      {
+        "trigger": "player_enters_nave",
+        "delay": 5,
+        "enemies": [
+          {
+            "type": "zombie",
+            "count": 3,
+            "positions": [
+              {"x": -10, "y": 0, "z": 20},
+              {"x": 10, "y": 0, "z": 20},
+              {"x": 0, "y": 0, "z": 30}
+            ],
+            "behavior": "patrol",
+            "ollama": {
+              "model": "llama3.1:7b",
+              "prompt": "You are a possessed cultist zombie in a cathedral. Shamble slowly. Groan. Attack if player is within 10 meters."
+            }
+          },
+          {
+            "type": "imp",
+            "count": 2,
+            "positions": [
+              {"x": -20, "y": 8, "z": 40},
+              {"x": 20, "y": 8, "z": 40}
+            ],
+            "behavior": "snipe",
+            "ollama": {
+              "model": "llama3.1:7b",
+              "prompt": "You are an imp on a cathedral balcony. Throw fireballs from above. Dodge if player aims at you."
+            }
+          }
+        ]
+      },
+      {
+        "trigger": "player_reaches_transept",
+        "delay": 2,
+        "enemies": [
+          {
+            "type": "demon",
+            "count": 2,
+            "spawn_type": "closet",
+            "positions": [
+              {"x": -90, "y": 0, "z": 60},
+              {"x": 90, "y": 0, "z": 60}
+            ],
+            "behavior": "charge"
+          },
+          {
+            "type": "cacodemon",
+            "count": 1,
+            "position": {"x": 0, "y": 15, "z": 80},
+            "behavior": "float_attack",
+            "ollama": {
+              "model": "llama3.1:7b",
+              "prompt": "You are flying cacodemon in cathedral. Stay airborne. Circle player. Spit fireballs."
+            }
+          }
+        ]
+      },
+      {
+        "trigger": "altar_activated",
+        "delay": 0,
+        "enemies": [
+          {
+            "type": "baron",
+            "count": 1,
+            "position": {"x": 0, "y": 2, "z": 110},
+            "behavior": "boss",
+            "health_multiplier": 1.5,
+            "damage_multiplier": 1.2,
+            "ollama": {
+              "model": "llama3.1:7b",
+              "prompt": "You are Baron of Hell boss guarding the corrupted altar. Aggressive. Throw green fireballs. Melee claw attacks. Never retreat.",
+              "temperature": 0.8
+            },
+            "phases": [
+              {
+                "health_threshold": 1.0,
+                "behavior": "ranged_focus",
+                "adds": []
+              },
+              {
+                "health_threshold": 0.5,
+                "behavior": "aggressive_melee",
+                "adds": [
+                  {"type": "imp", "count": 4, "formation": "corners"}
+                ]
+              },
+              {
+                "health_threshold": 0.25,
+                "behavior": "berserk",
+                "speed_multiplier": 1.5,
+                "adds": [
+                  {"type": "demon", "count": 2}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "ambush_zones": [
+      {
+        "id": "confessional_trap",
+        "trigger": {"x": 25, "z": 10, "radius": 3},
+        "spawn": [
+          {"type": "imp", "count": 2, "behind_player": true}
+        ]
+      },
+      {
+        "id": "choir_loft_snipe",
+        "trigger": {"x": 0, "z": 0, "radius": 20},
+        "spawn": [
+          {"type": "zombie", "count": 3, "position": {"x": 0, "y": 12, "z": -70}}
+        ]
+      }
+    ]
+  },
+  "items": {
+    "weapons": [
+      {
+        "type": "shotgun",
+        "position": {"x": 0, "y": 12, "z": -70},
+        "location": "choir_loft"
+      },
+      {
+        "type": "chaingun",
+        "position": {"x": -80, "y": 0, "z": 60},
+        "location": "transept_west",
+        "secret": false
+      },
+      {
+        "type": "rocket_launcher",
+        "position": {"x": 0, "y": 2, "z": -50},
+        "location": "crypt",
+        "secret": true,
+        "requires": "red_skull"
+      }
+    ],
+    "health": [
+      {
+        "type": "health_small",
+        "positions": [
+          {"x": -15, "y": 0, "z": -20},
+          {"x": 15, "y": 0, "z": -20},
+          {"x": -15, "y": 0, "z": 20},
+          {"x": 15, "y": 0, "z": 20}
+        ]
+      },
+      {
+        "type": "health_large",
+        "positions": [
+          {"x": -25, "y": 8, "z": 40},
+          {"x": 80, "y": 0, "z": 60}
+        ]
+      },
+      {
+        "type": "megahealth",
+        "position": {"x": 0, "y": 15, "z": -75},
+        "location": "organ_loft",
+        "secret": true
+      }
+    ],
+    "armor": [
+      {
+        "type": "armor_green",
+        "position": {"x": -90, "y": 0, "z": 60}
+      },
+      {
+        "type": "armor_blue",
+        "position": {"x": 25, "y": 0, "z": 50},
+        "location": "confessional_secret"
+      }
+    ],
+    "keys": [
+      {
+        "type": "red_skull",
+        "position": {"x": 0, "y": 8, "z": 40},
+        "location": "side_balcony",
+        "required_for": "crypt_entrance"
+      }
+    ],
+    "powerups": [
+      {
+        "type": "berserk",
+        "position": {"x": 0, "y": 2, "z": 110},
+        "spawn_trigger": "baron_defeated"
+      }
+    ]
+  },
+  "secrets": [
+    {
+      "id": "secret_confessional",
+      "location": {"x": 25, "y": 0, "z": 50},
+      "trigger": "use_confessional",
+      "contents": ["armor_blue", "ammo_rockets", "health_large"],
+      "hint": "One confessional has a false back wall..."
+    },
+    {
+      "id": "secret_organ",
+      "location": {"x": 0, "y": 15, "z": -75},
+      "trigger": "press_organ_keys",
+      "contents": ["megahealth", "soulsphere"],
+      "hint": "The organ still plays, if you know the right notes..."
+    },
+    {
+      "id": "secret_crypt",
+      "location": {"x": 0, "y": -5, "z": -50},
+      "trigger": "red_skull_door",
+      "contents": ["rocket_launcher", "ammo_rockets", "armor_green"],
+      "hint": "The dead keep their weapons..."
+    },
+    {
+      "id": "secret_altar_cache",
+      "location": {"x": 0, "y": -2, "z": 110},
+      "trigger": "destroy_altar",
+      "contents": ["bfg", "cell_pack", "megahealth"],
+      "hint": "Destroy the altar to reveal what lies beneath..."
+    },
+    {
+      "id": "secret_ceiling",
+      "location": {"x": 0, "y": 22, "z": 40},
+      "trigger": "rocket_jump",
+      "contents": ["invulnerability"],
+      "hint": "Look up..."
+    }
+  ],
+  "lighting": {
+    "ambient": {
+      "color": "#110011",
+      "intensity": 0.15
+    },
+    "directional": {
+      "color": "#6600aa",
+      "intensity": 0.3,
+      "position": {"x": -50, "y": 80, "z": 50},
+      "castShadow": true,
+      "shadow": {
+        "mapSize": 4096,
+        "bias": -0.0001
+      }
+    },
+    "point": [
+      {
+        "position": {"x": 0, "y": 3, "z": 110},
+        "color": "#ff0000",
+        "intensity": 8,
+        "distance": 30,
+        "pulsate": true,
+        "frequency": 0.5
+      }
+    ],
+    "candles": {
+      "positions_auto": "along_walls",
+      "spacing": 10,
+      "color": "#ffaa00",
+      "intensity": 0.5,
+      "distance": 8,
+      "flicker": true,
+      "model": "models/candle_holder.glb"
+    },
+    "chandeliers": [
+      {
+        "position": {"x": 0, "y": 18, "z": 0},
+        "model": "models/chandelier_gothic.glb",
+        "lights": 12,
+        "color": "#ff8800",
+        "intensity": 1,
+        "sway": true
+      },
+      {
+        "position": {"x": 0, "y": 18, "z": 60},
+        "model": "models/chandelier_gothic.glb",
+        "lights": 12,
+        "color": "#ff8800",
+        "intensity": 1,
+        "sway": true
+      }
+    ]
+  },
+  "particles": {
+    "dust_rays": {
+      "enabled": true,
+      "sources": "stained_glass_windows",
+      "density": 0.3,
+      "color": "#ffffff",
+      "opacity": 0.1
+    },
+    "demonic_energy": {
+      "position": {"x": 0, "y": 2, "z": 110},
+      "type": "spiral_up",
+      "color": "#ff0000",
+      "count": 1000,
+      "speed": 2,
+      "lifetime": 3
+    },
+    "blood_drips": {
+      "positions": "ceiling_random",
+      "count": 50,
+      "rate": 0.1,
+      "gravity": true
+    }
+  },
+  "atmosphere": {
+    "fog": {
+      "color": "#220022",
+      "near": 30,
+      "far": 120,
+      "density": 0.02
+    },
+    "ambient_occlusion": {
+      "enabled": true,
+      "intensity": 1.5
+    }
+  },
+  "audio": {
+    "ambient": {
+      "track": "sounds/ambient/cathedral_wind.ogg",
+      "volume": 0.2,
+      "loop": true
+    },
+    "music": {
+      "track": "sounds/music/cathedral_horror.ogg",
+      "volume": 0.4,
+      "loop": true,
+      "boss_music": {
+        "track": "sounds/music/boss_battle.ogg",
+        "trigger": "altar_activated"
+      }
+    },
+    "positional": [
+      {
+        "sound": "sounds/effects/evil_chant.ogg",
+        "position": {"x": 0, "y": 2, "z": 110},
+        "volume": 0.5,
+        "distance": 50,
+        "loop": true
+      },
+      {
+        "sound": "sounds/effects/dripping_blood.ogg",
+        "positions": "ceiling_random",
+        "volume": 0.1,
+        "distance": 10,
+        "loop": true
+      }
+    ]
+  },
+  "scripting": {
+    "events": [
+      {
+        "name": "altar_sequence",
+        "trigger": "player_touches_altar",
+        "actions": [
+          {"wait": 2},
+          {"message": "You feel an unholy presence..."},
+          {"camera_shake": {"intensity": 0.5, "duration": 3}},
+          {"spawn_boss": "baron"},
+          {"lock_doors": true},
+          {"music_change": "boss_battle"}
+        ]
+      },
+      {
+        "name": "victory",
+        "trigger": "baron_defeated",
+        "actions": [
+          {"message": "The cathedral is purged... for now."},
+          {"unlock_doors": true},
+          {"spawn_item": "berserk"},
+          {"music_change": "ambient"}
+        ]
+      }
+    ]
+  }
+}

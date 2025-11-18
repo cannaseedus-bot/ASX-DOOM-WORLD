@@ -1,0 +1,1019 @@
+{
+  "system": {
+    "name": "ASX DOOM Construction Set",
+    "version": "1.0.0",
+    "author": "Michael - ASX Interactive Systems",
+    "description": "TES-style construction set for building DOOM hellscape worlds with AI assistance",
+    "boot": "constructor",
+    "theme": "doom-dark"
+  },
+  "routes": {
+    "/": "constructor",
+    "#/constructor": "constructor",
+    "#/ai-assistant": "aiAssistant",
+    "#/templates": "templates",
+    "#/asset-browser": "assetBrowser",
+    "#/terrain-tools": "terrainTools",
+    "#/npc-spawner": "npcSpawner",
+    "#/lighting": "lightingStudio",
+    "#/compile": "levelCompiler",
+    "#/play-test": "playTest",
+    "#/manual": "manual",
+    "#/multiplayer": "multiplayerManager"
+  },
+  "pages": {
+    "constructor": {
+      "title": "ASX DOOM Construction Set",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "editor-main",
+          "panels": {
+            "toolbar": {
+              "position": "top",
+              "height": "60px",
+              "buttons": [
+                {"icon": "🤖", "label": "AI Assistant", "link": "#/ai-assistant"},
+                {"icon": "📦", "label": "Templates", "link": "#/templates"},
+                {"icon": "🎨", "label": "Assets", "link": "#/asset-browser"},
+                {"icon": "⛰️", "label": "Terrain", "link": "#/terrain-tools"},
+                {"icon": "👹", "label": "NPCs", "link": "#/npc-spawner"},
+                {"icon": "💡", "label": "Lighting", "link": "#/lighting"},
+                {"icon": "📦", "label": "Compile", "link": "#/compile"},
+                {"icon": "▶️", "label": "Play Test", "link": "#/play-test"},
+                {"icon": "📖", "label": "Manual", "link": "#/manual"}
+              ]
+            },
+            "viewport": {
+              "position": "center",
+              "width": "60%",
+              "controls": "free-fly",
+              "grid": true,
+              "helpers": true
+            },
+            "hierarchy": {
+              "position": "left",
+              "width": "20%",
+              "title": "Scene Hierarchy",
+              "tree": true
+            },
+            "inspector": {
+              "position": "right",
+              "width": "20%",
+              "title": "Inspector",
+              "properties": true
+            },
+            "console": {
+              "position": "bottom",
+              "height": "200px",
+              "title": "AI Console & Logs"
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "construction-mode",
+        "camera": "editor",
+        "controls": "orbit",
+        "renderer": {
+          "antialias": true,
+          "shadows": true,
+          "physicallyCorrectLights": true
+        }
+      },
+      "asx": {
+        "inline": "loadConstructorCore()"
+      }
+    },
+    "aiAssistant": {
+      "title": "AI Building Assistant",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "ai-chat",
+          "sections": {
+            "chat": {
+              "title": "AI Constructor Assistant - Powered by Ollama",
+              "placeholder": "Ask me to build anything: 'Create a hellscape arena with lava moat' or 'Add 5 imp spawners in circular pattern'",
+              "features": [
+                "Natural language world building",
+                "Auto-placement algorithms",
+                "Terrain generation",
+                "NPC behavior scripting",
+                "Lighting setups",
+                "Asset recommendations"
+              ]
+            },
+            "quick-actions": {
+              "title": "Quick Build Commands",
+              "commands": [
+                {
+                  "label": "🏰 Generate Arena",
+                  "prompt": "Create a deathmatch arena 100x100 units with 4 weapon spawns and 8 player starts"
+                },
+                {
+                  "label": "👹 Spawn Enemy Wave",
+                  "prompt": "Add 10 enemies in formation: 5 imps, 3 demons, 2 cacodemons"
+                },
+                {
+                  "label": "⛰️ Build Terrain",
+                  "prompt": "Generate rocky hellscape terrain 200x200 with lava rivers"
+                },
+                {
+                  "label": "💡 Dramatic Lighting",
+                  "prompt": "Set up hellscape lighting: red ambient, flickering torches, volumetric fog"
+                },
+                {
+                  "label": "🎯 Add Objectives",
+                  "prompt": "Place 3 key cards and corresponding doors in strategic locations"
+                },
+                {
+                  "label": "🏛️ Gothic Architecture",
+                  "prompt": "Build a gothic cathedral interior with blood-stained glass"
+                }
+              ]
+            },
+            "ai-modes": {
+              "title": "AI Assistant Modes",
+              "modes": [
+                {
+                  "name": "Builder Mode",
+                  "model": "llama3.1:7b",
+                  "system": "You are an expert DOOM level designer. Generate precise ASX JSON for world building commands. Always output valid JSON with coordinates, types, and properties.",
+                  "temperature": 0.7
+                },
+                {
+                  "name": "Designer Mode",
+                  "model": "llama3.1:7b",
+                  "system": "You are a creative game designer. Suggest interesting layouts, enemy placements, and gameplay flow. Focus on fun and balance.",
+                  "temperature": 0.9
+                },
+                {
+                  "name": "Technical Mode",
+                  "model": "llama3.1:7b",
+                  "system": "You are a technical artist. Optimize performance, suggest LOD strategies, manage draw calls, and ensure stable framerates.",
+                  "temperature": 0.3
+                }
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "preview-window",
+        "size": "small"
+      },
+      "asx": {
+        "inline": "loadAIAssistant()"
+      }
+    },
+    "templates": {
+      "title": "Pre-Built Environment Templates",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "template-gallery",
+          "categories": {
+            "arenas": {
+              "title": "🏟️ Deathmatch Arenas",
+              "description": "Pre-built multiplayer maps ready to customize",
+              "templates": [
+                {
+                  "id": "arena_circular",
+                  "name": "Circular Arena",
+                  "thumbnail": "arena_circular.jpg",
+                  "description": "Classic circular arena with central platform and outer ring. 8 player spawns, 4 weapon pickups.",
+                  "size": "100x100",
+                  "playerCount": "4-8",
+                  "difficulty": "Easy",
+                  "data": "templates/arena_circular.json"
+                },
+                {
+                  "id": "arena_towers",
+                  "name": "Tower Arena",
+                  "thumbnail": "arena_towers.jpg",
+                  "description": "Multi-level arena with 4 corner towers connected by bridges. Sniper positions.",
+                  "size": "150x150",
+                  "playerCount": "8-16",
+                  "difficulty": "Medium",
+                  "data": "templates/arena_towers.json"
+                },
+                {
+                  "id": "arena_hellpit",
+                  "name": "Hellpit Arena",
+                  "thumbnail": "arena_hellpit.jpg",
+                  "description": "Lava-filled pit with floating platforms and teleporters. High risk gameplay.",
+                  "size": "120x120",
+                  "playerCount": "6-12",
+                  "difficulty": "Hard",
+                  "data": "templates/arena_hellpit.json"
+                }
+              ]
+            },
+            "campaigns": {
+              "title": "📖 Campaign Levels",
+              "description": "Story-driven levels with objectives and progression",
+              "templates": [
+                {
+                  "id": "hangar",
+                  "name": "UAC Hangar (E1M1 Style)",
+                  "thumbnail": "hangar.jpg",
+                  "description": "Classic hangar layout with secrets, key cards, and progressive difficulty.",
+                  "size": "250x250",
+                  "enemies": "15-20",
+                  "secrets": 3,
+                  "data": "templates/hangar.json"
+                },
+                {
+                  "id": "cathedral",
+                  "name": "Corrupted Cathedral",
+                  "thumbnail": "cathedral.jpg",
+                  "description": "Gothic cathedral overrun by demons. Vertical gameplay, stained glass, dark corners.",
+                  "size": "300x200",
+                  "enemies": "30-40",
+                  "secrets": 5,
+                  "data": "templates/cathedral.json"
+                },
+                {
+                  "id": "server_core",
+                  "name": "ASX Server Core",
+                  "thumbnail": "server_core.jpg",
+                  "description": "High-tech server room with flickering lights, data streams, and cybernetic demons.",
+                  "size": "200x200",
+                  "enemies": "25-35",
+                  "secrets": 4,
+                  "data": "templates/server_core.json"
+                }
+              ]
+            },
+            "environments": {
+              "title": "🌋 Environment Presets",
+              "description": "Terrain and atmosphere templates",
+              "templates": [
+                {
+                  "id": "hellscape_basic",
+                  "name": "Basic Hellscape",
+                  "thumbnail": "hellscape_basic.jpg",
+                  "description": "Rocky terrain with lava rivers, fire particles, red ambient lighting.",
+                  "terrain": "procedural_rocky",
+                  "lighting": "hellscape_standard",
+                  "particles": "fire, smoke, embers",
+                  "data": "templates/hellscape_basic.json"
+                },
+                {
+                  "id": "tech_facility",
+                  "name": "Tech Facility",
+                  "thumbnail": "tech_facility.jpg",
+                  "description": "Clean sci-fi environment with metal textures, hologram displays, flickering screens.",
+                  "terrain": "flat_modular",
+                  "lighting": "tech_blue",
+                  "particles": "sparks, holograms",
+                  "data": "templates/tech_facility.json"
+                },
+                {
+                  "id": "wasteland",
+                  "name": "Demon Wasteland",
+                  "thumbnail": "wasteland.jpg",
+                  "description": "Desolate landscape with dead trees, bones, fog, distant fire.",
+                  "terrain": "procedural_wasteland",
+                  "lighting": "overcast_red",
+                  "particles": "fog, ash",
+                  "data": "templates/wasteland.json"
+                }
+              ]
+            },
+            "mechanics": {
+              "title": "⚙️ Gameplay Mechanics",
+              "description": "Pre-configured gameplay systems",
+              "templates": [
+                {
+                  "id": "wave_defense",
+                  "name": "Wave Defense Setup",
+                  "description": "Spawner system with escalating difficulty waves",
+                  "data": "templates/wave_defense.json"
+                },
+                {
+                  "id": "boss_arena",
+                  "name": "Boss Arena",
+                  "description": "Large arena with boss spawn point, phases, and cover",
+                  "data": "templates/boss_arena.json"
+                },
+                {
+                  "id": "puzzle_doors",
+                  "name": "Key Card Puzzle",
+                  "description": "3 color-coded keys and doors with logical progression",
+                  "data": "templates/puzzle_doors.json"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "template-preview",
+        "camera": "orbit"
+      },
+      "asx": {
+        "inline": "loadTemplateGallery()"
+      }
+    },
+    "assetBrowser": {
+      "title": "Asset Browser",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "asset-grid",
+          "categories": {
+            "models": {
+              "title": "3D Models",
+              "path": "/assets/models/",
+              "types": [".gltf", ".glb", ".obj"],
+              "subcategories": {
+                "enemies": ["imp", "demon", "cacodemon", "baron", "cyberdemon"],
+                "weapons": ["pistol", "shotgun", "chaingun", "rocket_launcher", "bfg"],
+                "items": ["health", "armor", "ammo", "powerups", "keys"],
+                "architecture": ["walls", "doors", "pillars", "arches", "platforms"],
+                "decorative": ["torches", "skulls", "chains", "blood_decals"]
+              }
+            },
+            "textures": {
+              "title": "Textures",
+              "path": "/assets/textures/3d/",
+              "types": [".jpg", ".png"],
+              "subcategories": {
+                "walls": ["stone", "metal", "tech", "flesh", "gothic"],
+                "floors": ["tile", "grate", "rock", "blood", "lava"],
+                "environment": ["sky", "fog", "particles"],
+                "materials": ["diffuse", "normal", "roughness", "metallic"]
+              }
+            },
+            "sounds": {
+              "title": "Sounds",
+              "path": "/assets/sounds/",
+              "types": [".mp3", ".ogg", ".wav"],
+              "subcategories": {
+                "weapons": ["pistol_fire", "shotgun_pump", "explosion"],
+                "enemies": ["imp_sight", "demon_pain", "cacodemon_death"],
+                "ambient": ["wind", "fire", "machinery", "screams"],
+                "music": ["e1m1", "e1m2", "intermission"]
+              }
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "asset-preview",
+        "camera": "orbit",
+        "lighting": "preview"
+      },
+      "asx": {
+        "inline": "loadAssetBrowser()"
+      }
+    },
+    "terrainTools": {
+      "title": "Terrain Tools",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "terrain-editor",
+          "tools": {
+            "sculpt": {
+              "title": "Sculpting",
+              "brushes": [
+                {"name": "Raise", "icon": "⬆️", "strength": 1.0, "radius": 10},
+                {"name": "Lower", "icon": "⬇️", "strength": 1.0, "radius": 10},
+                {"name": "Flatten", "icon": "▬", "strength": 1.0, "radius": 10},
+                {"name": "Smooth", "icon": "〰️", "strength": 0.5, "radius": 15},
+                {"name": "Noise", "icon": "📊", "strength": 0.5, "radius": 20}
+              ]
+            },
+            "paint": {
+              "title": "Texture Painting",
+              "layers": ["base", "detail", "blend"],
+              "textures": ["rock", "dirt", "lava", "metal", "flesh"]
+            },
+            "generation": {
+              "title": "Procedural Generation",
+              "algorithms": [
+                {
+                  "name": "Perlin Noise",
+                  "params": {
+                    "octaves": 4,
+                    "scale": 50,
+                    "height": 20,
+                    "seed": "random"
+                  }
+                },
+                {
+                  "name": "Voronoi",
+                  "params": {
+                    "cells": 20,
+                    "height": 15,
+                    "randomness": 0.5
+                  }
+                },
+                {
+                  "name": "Erosion",
+                  "params": {
+                    "iterations": 100,
+                    "strength": 0.3
+                  }
+                }
+              ]
+            },
+            "placement": {
+              "title": "Surface Placement",
+              "features": [
+                "Paint trees/rocks",
+                "Scatter debris",
+                "Place decals",
+                "Distribute enemies"
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "terrain-editor",
+        "camera": "top-down",
+        "raycaster": true
+      },
+      "asx": {
+        "inline": "loadTerrainTools()"
+      }
+    },
+    "npcSpawner": {
+      "title": "NPC & Enemy Spawner",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "npc-spawner",
+          "sections": {
+            "types": {
+              "title": "Enemy Types",
+              "categories": {
+                "tier1": {
+                  "label": "Tier 1 (Cannon Fodder)",
+                  "enemies": [
+                    {
+                      "id": "zombie",
+                      "name": "Zombie",
+                      "health": 20,
+                      "damage": 5,
+                      "speed": 0.5,
+                      "model": "zombie.glb"
+                    },
+                    {
+                      "id": "imp",
+                      "name": "Imp",
+                      "health": 60,
+                      "damage": 10,
+                      "speed": 1.0,
+                      "model": "imp.glb"
+                    }
+                  ]
+                },
+                "tier2": {
+                  "label": "Tier 2 (Mid-Level)",
+                  "enemies": [
+                    {
+                      "id": "demon",
+                      "name": "Demon",
+                      "health": 150,
+                      "damage": 20,
+                      "speed": 1.5,
+                      "model": "demon.glb"
+                    },
+                    {
+                      "id": "cacodemon",
+                      "name": "Cacodemon",
+                      "health": 400,
+                      "damage": 15,
+                      "speed": 0.8,
+                      "flying": true,
+                      "model": "cacodemon.glb"
+                    }
+                  ]
+                },
+                "tier3": {
+                  "label": "Tier 3 (Elite)",
+                  "enemies": [
+                    {
+                      "id": "baron",
+                      "name": "Baron of Hell",
+                      "health": 1000,
+                      "damage": 40,
+                      "speed": 1.0,
+                      "model": "baron.glb"
+                    },
+                    {
+                      "id": "cyberdemon",
+                      "name": "Cyberdemon",
+                      "health": 4000,
+                      "damage": 100,
+                      "speed": 0.7,
+                      "boss": true,
+                      "model": "cyberdemon.glb"
+                    }
+                  ]
+                }
+              }
+            },
+            "behavior": {
+              "title": "AI Behavior",
+              "presets": [
+                {
+                  "name": "Patrol",
+                  "description": "Walk between waypoints, attack on sight",
+                  "ollama": {
+                    "model": "llama3.1:7b",
+                    "prompt": "You are patrolling demon. Walk waypoints. Attack player if seen within 20 units. Return to patrol if player escapes.",
+                    "temperature": 0.5
+                  }
+                },
+                {
+                  "name": "Guard",
+                  "description": "Stay at position, attack if player approaches",
+                  "ollama": {
+                    "model": "llama3.1:7b",
+                    "prompt": "You are guard demon. Stay at post. Attack if player within 15 units. Pursue briefly then return.",
+                    "temperature": 0.3
+                  }
+                },
+                {
+                  "name": "Hunt",
+                  "description": "Actively seek and chase player",
+                  "ollama": {
+                    "model": "llama3.1:7b",
+                    "prompt": "You are hunter demon. Actively seek player. Use pathfinding. Never give up chase. Smart positioning.",
+                    "temperature": 0.7
+                  }
+                },
+                {
+                  "name": "Ambush",
+                  "description": "Hide, wait for trigger, then attack",
+                  "ollama": {
+                    "model": "llama3.1:7b",
+                    "prompt": "You are ambush demon. Stay hidden until player enters trigger zone. Then attack aggressively.",
+                    "temperature": 0.6
+                  }
+                }
+              ]
+            },
+            "spawning": {
+              "title": "Spawn Methods",
+              "methods": [
+                {
+                  "name": "Single Placement",
+                  "description": "Click to place individual enemy"
+                },
+                {
+                  "name": "Formation",
+                  "description": "Place group in pattern (line, circle, grid)",
+                  "patterns": ["line", "circle", "grid", "arc", "random"]
+                },
+                {
+                  "name": "Wave Spawner",
+                  "description": "Create spawn point that triggers waves",
+                  "config": {
+                    "waves": 5,
+                    "enemiesPerWave": 10,
+                    "delay": 30,
+                    "escalation": true
+                  }
+                },
+                {
+                  "name": "Monster Closet",
+                  "description": "Teleport enemies on trigger",
+                  "config": {
+                    "triggerType": "player_enters",
+                    "capacity": 20,
+                    "delayBetween": 0.5
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "npc-placement",
+        "camera": "editor",
+        "helpers": ["spawn_points", "patrol_paths", "trigger_volumes"]
+      },
+      "asx": {
+        "inline": "loadNPCSpawner()"
+      }
+    },
+    "lightingStudio": {
+      "title": "Lighting Studio",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "lighting-editor",
+          "sections": {
+            "presets": {
+              "title": "Lighting Presets",
+              "environments": [
+                {
+                  "name": "Hellscape Standard",
+                  "ambient": "#330000",
+                  "directional": {"color": "#ff0000", "intensity": 0.7},
+                  "fog": {"color": "#440000", "density": 0.01},
+                  "particles": "embers"
+                },
+                {
+                  "name": "Tech Facility",
+                  "ambient": "#001133",
+                  "directional": {"color": "#0066ff", "intensity": 0.5},
+                  "fog": {"color": "#000011", "density": 0.005},
+                  "particles": "holograms"
+                },
+                {
+                  "name": "Gothic Cathedral",
+                  "ambient": "#110011",
+                  "directional": {"color": "#6600aa", "intensity": 0.3},
+                  "fog": {"color": "#220022", "density": 0.02},
+                  "particles": "dust_rays"
+                }
+              ]
+            },
+            "lights": {
+              "title": "Light Sources",
+              "types": [
+                {
+                  "type": "ambient",
+                  "icon": "🌍",
+                  "properties": ["color", "intensity"]
+                },
+                {
+                  "type": "directional",
+                  "icon": "☀️",
+                  "properties": ["color", "intensity", "position", "target", "castShadow"]
+                },
+                {
+                  "type": "point",
+                  "icon": "💡",
+                  "properties": ["color", "intensity", "distance", "decay", "castShadow"]
+                },
+                {
+                  "type": "spot",
+                  "icon": "🔦",
+                  "properties": ["color", "intensity", "angle", "penumbra", "distance", "castShadow"]
+                },
+                {
+                  "type": "hemisphere",
+                  "icon": "🌓",
+                  "properties": ["skyColor", "groundColor", "intensity"]
+                }
+              ]
+            },
+            "effects": {
+              "title": "Atmospheric Effects",
+              "options": [
+                {
+                  "name": "Volumetric Fog",
+                  "params": ["density", "color", "near", "far"]
+                },
+                {
+                  "name": "God Rays",
+                  "params": ["intensity", "samples", "decay"]
+                },
+                {
+                  "name": "Flickering Lights",
+                  "params": ["frequency", "intensity_range"]
+                },
+                {
+                  "name": "Particle Systems",
+                  "types": ["fire", "smoke", "embers", "sparks", "dust"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "lighting-preview",
+        "camera": "free",
+        "realtime": true
+      },
+      "asx": {
+        "inline": "loadLightingStudio()"
+      }
+    },
+    "levelCompiler": {
+      "title": "Level Compiler & Exporter",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "compiler",
+          "sections": {
+            "validation": {
+              "title": "Level Validation",
+              "checks": [
+                {"id": "player_start", "label": "Player start points", "required": true},
+                {"id": "exit", "label": "Level exit", "required": false},
+                {"id": "enemies", "label": "Enemy spawns", "required": false},
+                {"id": "weapons", "label": "Weapon pickups", "required": false},
+                {"id": "lighting", "label": "Adequate lighting", "required": true},
+                {"id": "playable_area", "label": "Playable area bounds", "required": true}
+              ]
+            },
+            "optimization": {
+              "title": "Optimization",
+              "options": [
+                {"id": "lod", "label": "Generate LOD levels", "default": true},
+                {"id": "occlusion", "label": "Occlusion culling", "default": true},
+                {"id": "lightmaps", "label": "Bake lightmaps", "default": false},
+                {"id": "texture_atlas", "label": "Create texture atlas", "default": true},
+                {"id": "merge_meshes", "label": "Merge static meshes", "default": true}
+              ]
+            },
+            "export": {
+              "title": "Export Formats",
+              "formats": [
+                {
+                  "name": "ASX JSON",
+                  "extension": ".json",
+                  "description": "Native ASX format for web playback",
+                  "features": ["Full scene data", "AI configs", "Multiplayer support"]
+                },
+                {
+                  "name": "WAD (Zandronum)",
+                  "extension": ".wad",
+                  "description": "Classic DOOM format for Zandronum server",
+                  "features": ["Multiplayer compatible", "Mod support"]
+                },
+                {
+                  "name": "GLTF Scene",
+                  "extension": ".gltf",
+                  "description": "3D scene export for external tools",
+                  "features": ["Geometry", "Materials", "Animations"]
+                }
+              ]
+            },
+            "metadata": {
+              "title": "Level Metadata",
+              "fields": [
+                {"id": "name", "label": "Level Name", "required": true},
+                {"id": "author", "label": "Author", "default": "Michael"},
+                {"id": "description", "label": "Description", "multiline": true},
+                {"id": "difficulty", "label": "Difficulty", "type": "select", "options": [1,2,3,4,5]},
+                {"id": "playerCount", "label": "Player Count", "type": "range", "min": 1, "max": 16},
+                {"id": "tags", "label": "Tags", "type": "tags"}
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "compile-preview",
+        "camera": "orbit"
+      },
+      "asx": {
+        "inline": "loadLevelCompiler()"
+      }
+    },
+    "playTest": {
+      "title": "Play Test Mode",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "playtest",
+          "controls": {
+            "movement": "WASD",
+            "mouse": "Look",
+            "shoot": "Left Click",
+            "jump": "Space",
+            "use": "E",
+            "weapon_switch": "1-9",
+            "console": "~"
+          }
+        }
+      },
+      "webgl": {
+        "scene": "fps-gameplay",
+        "camera": "first-person",
+        "controls": "fps"
+      },
+      "asx": {
+        "inline": "loadPlayTest()"
+      }
+    },
+    "manual": {
+      "title": "ASX DOOM Construction Set - Manual",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "documentation",
+          "sections": {
+            "getting_started": {
+              "title": "📖 Getting Started",
+              "chapters": [
+                {
+                  "id": "intro",
+                  "title": "Introduction to ASX DOOM Constructor",
+                  "content": "manual/intro.md"
+                },
+                {
+                  "id": "interface",
+                  "title": "Understanding the Interface",
+                  "content": "manual/interface.md"
+                },
+                {
+                  "id": "first_level",
+                  "title": "Your First Level (5-Minute Tutorial)",
+                  "content": "manual/first_level.md"
+                }
+              ]
+            },
+            "ai_assistant": {
+              "title": "🤖 AI Assistant Guide",
+              "chapters": [
+                {
+                  "id": "ai_basics",
+                  "title": "Using the AI Assistant",
+                  "content": "manual/ai_basics.md"
+                },
+                {
+                  "id": "ai_commands",
+                  "title": "Natural Language Commands",
+                  "content": "manual/ai_commands.md"
+                },
+                {
+                  "id": "ai_examples",
+                  "title": "AI Command Examples",
+                  "content": "manual/ai_examples.md"
+                }
+              ]
+            },
+            "templates": {
+              "title": "📦 Working with Templates",
+              "chapters": [
+                {
+                  "id": "template_basics",
+                  "title": "Loading and Modifying Templates",
+                  "content": "manual/templates.md"
+                },
+                {
+                  "id": "template_json",
+                  "title": "Understanding Template JSON",
+                  "content": "manual/template_json.md"
+                }
+              ]
+            },
+            "terrain": {
+              "title": "⛰️ Terrain Sculpting",
+              "chapters": [
+                {
+                  "id": "terrain_basics",
+                  "title": "Terrain Tools Overview",
+                  "content": "manual/terrain_basics.md"
+                },
+                {
+                  "id": "procedural",
+                  "title": "Procedural Generation",
+                  "content": "manual/procedural.md"
+                },
+                {
+                  "id": "painting",
+                  "title": "Texture Painting",
+                  "content": "manual/painting.md"
+                }
+              ]
+            },
+            "npcs": {
+              "title": "👹 NPC & AI Systems",
+              "chapters": [
+                {
+                  "id": "npc_spawning",
+                  "title": "Spawning Enemies",
+                  "content": "manual/npc_spawning.md"
+                },
+                {
+                  "id": "ai_behavior",
+                  "title": "AI Behavior with Ollama",
+                  "content": "manual/ai_behavior.md"
+                },
+                {
+                  "id": "formations",
+                  "title": "Enemy Formations & Waves",
+                  "content": "manual/formations.md"
+                }
+              ]
+            },
+            "lighting": {
+              "title": "💡 Lighting & Atmosphere",
+              "chapters": [
+                {
+                  "id": "lighting_basics",
+                  "title": "Lighting Fundamentals",
+                  "content": "manual/lighting_basics.md"
+                },
+                {
+                  "id": "effects",
+                  "title": "Atmospheric Effects",
+                  "content": "manual/effects.md"
+                },
+                {
+                  "id": "performance",
+                  "title": "Lighting Performance",
+                  "content": "manual/lighting_performance.md"
+                }
+              ]
+            },
+            "advanced": {
+              "title": "🔧 Advanced Topics",
+              "chapters": [
+                {
+                  "id": "custom_scripts",
+                  "title": "Custom ASX Scripts",
+                  "content": "manual/custom_scripts.md"
+                },
+                {
+                  "id": "multiplayer",
+                  "title": "Multiplayer Setup",
+                  "content": "manual/multiplayer.md"
+                },
+                {
+                  "id": "optimization",
+                  "title": "Performance Optimization",
+                  "content": "manual/optimization.md"
+                },
+                {
+                  "id": "modding",
+                  "title": "Creating Custom Assets",
+                  "content": "manual/modding.md"
+                }
+              ]
+            },
+            "reference": {
+              "title": "📚 Reference",
+              "chapters": [
+                {
+                  "id": "json_spec",
+                  "title": "ASX JSON Specification",
+                  "content": "manual/json_spec.md"
+                },
+                {
+                  "id": "api",
+                  "title": "API Reference",
+                  "content": "manual/api.md"
+                },
+                {
+                  "id": "shortcuts",
+                  "title": "Keyboard Shortcuts",
+                  "content": "manual/shortcuts.md"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "flat"
+      },
+      "asx": {
+        "inline": "loadManual()"
+      }
+    },
+    "multiplayerManager": {
+      "title": "Multiplayer Server Manager",
+      "hud": {
+        "content": {
+          "type": "custom",
+          "layout": "multiplayer-dashboard",
+          "sections": {
+            "servers": {
+              "title": "Active Servers",
+              "list": []
+            },
+            "quickstart": {
+              "title": "Quick Start",
+              "presets": [
+                {
+                  "name": "Deathmatch",
+                  "maxPlayers": 8,
+                  "mode": "deathmatch",
+                  "fraglimit": 25
+                },
+                {
+                  "name": "Co-op",
+                  "maxPlayers": 4,
+                  "mode": "cooperative",
+                  "difficulty": 3
+                }
+              ]
+            }
+          }
+        }
+      },
+      "webgl": {
+        "scene": "flat"
+      },
+      "asx": {
+        "inline": "loadMultiplayerManager()"
+      }
+    }
+  }
+}

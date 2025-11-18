@@ -1,0 +1,38 @@
+{
+  "id": "asx-doom-os",
+  "version": "1.0.0",
+  "boot": {
+    "scene": "hellscape-01",
+    "hud": "combat-hud"
+  },
+  "scenes": {
+    "hellscape-01": {
+      "title": "ASX World of DOOM — Hell Chamber",
+      "type": "three-scene",
+      "map": "./world/maps/hellscape.json"
+    }
+  },
+  "hud": {
+    "combat-hud": {
+      "type": "dom",
+      "panels": [
+        { "id": "hp", "label": "HP", "value": 100, "max": 100 },
+        { "id": "armor", "label": "ARMOR", "value": 0, "max": 100 },
+        { "id": "ammo", "label": "AMMO", "value": 50, "max": 200 },
+        { "id": "weapon", "label": "WEAPON", "value": "SHOTGUN" }
+      ]
+    }
+  },
+  "player": {
+    "base": {
+      "name": "Slayer",
+      "str": 8,
+      "agi": 7,
+      "int": 4,
+      "end": 8,
+      "lck": 4
+    },
+    "class": "warrior",
+    "birthsign": "The Warrior"
+  }
+}
