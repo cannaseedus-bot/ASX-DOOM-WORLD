@@ -1,5 +1,5 @@
 # 🔥 ASX DOOM WORLD - Complete Developer Compendium 🔥
-
+<img src="https://github.com/cannaseedus-bot/ASX-DOOM-WORLD/blob/main/asx-doom-world-logo-hellfire-pentagram-smallskull.svg">
 **"War... war never changes."** — The ASX DOOM manifesto
 
 ---
