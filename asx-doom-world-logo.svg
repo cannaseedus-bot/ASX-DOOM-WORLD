@@ -1,0 +1,110 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    ASX DOOM WORLD – Badge Logo
+    Palette:
+      #05060a   – deep space background
+      #0cf2a5   – ASX neon
+      #ff8a3c   – toxic orange
+      #1b2735   – inner ring dark
+      #101520   – panel background
+      #f4f8ff   – light text
+  -->
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="#05060a"/>
+
+  <!-- Outer glow ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#0cf2a5" stroke-width="4" opacity="0.5"/>
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#0cf2a5" stroke-width="2" opacity="0.25"/>
+
+  <!-- Badge core -->
+  <circle cx="256" cy="256" r="185" fill="#101520" stroke="#1b2735" stroke-width="6"/>
+
+  <!-- Inner energy ring -->
+  <circle cx="256" cy="256" r="155" fill="none" stroke="#0cf2a5" stroke-width="3" stroke-dasharray="8 10" opacity="0.9"/>
+
+  <!-- Horizon slices (wasteland layers) -->
+  <g transform="translate(0,10)">
+    <!-- Lower dark base -->
+    <path d="M104 310 Q 160 280 220 295 T 408 305 L 408 360 L 104 360 Z"
+          fill="#05060f"/>
+    <!-- Mid orange ridge -->
+    <path d="M112 288 Q 170 260 230 268 T 400 280 L 400 305 L 112 305 Z"
+          fill="#ff8a3c" opacity="0.85"/>
+    <!-- Cracked ridge lines -->
+    <path d="M160 284 L 178 270 L 190 278 L 206 266"
+          fill="none" stroke="#101520" stroke-width="2" stroke-linecap="round"/>
+    <path d="M250 274 L 262 260 L 278 268 L 292 256"
+          fill="none" stroke="#101520" stroke-width="2" stroke-linecap="round"/>
+    <path d="M320 272 L 334 262 L 348 268 L 364 258"
+          fill="none" stroke="#101520" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Planet / Doom World core -->
+  <g transform="translate(0,-10)">
+    <!-- Planet body -->
+    <circle cx="256" cy="220" r="90" fill="#050b14" stroke="#0cf2a5" stroke-width="3"/>
+
+    <!-- Planet ring -->
+    <ellipse cx="256" cy="220" rx="120" ry="32"
+             fill="none" stroke="#0cf2a5" stroke-width="3" opacity="0.6"/>
+
+    <!-- Atmosphere highlight -->
+    <path d="M176 210 Q 256 165 336 210"
+          fill="none" stroke="#0cf2a5" stroke-width="2" opacity="0.7"/>
+
+    <!-- Doom cracks on planet -->
+    <path d="M256 140 L 252 160 L 260 182 L 248 204 L 255 228 L 248 246"
+          fill="none" stroke="#ff8a3c" stroke-width="3" stroke-linecap="round"/>
+
+    <path d="M220 168 L 232 184 L 226 198 L 236 212 L 228 226"
+          fill="none" stroke="#ff8a3c" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+
+    <path d="M292 168 L 284 186 L 296 202 L 288 220 L 298 236"
+          fill="none" stroke="#ff8a3c" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+
+    <!-- Neon fissure glow -->
+    <path d="M252 160 L 260 182 L 248 204 L 255 228"
+          fill="none" stroke="#0cf2a5" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <!-- ASX Top Label -->
+  <text x="50%" y="78" text-anchor="middle"
+        font-family="'Orbitron', system-ui, sans-serif"
+        font-size="42" letter-spacing="6"
+        fill="#0cf2a5">
+    ASX
+  </text>
+
+  <!-- DOOM WORLD Bottom Label (arc-ish layout) -->
+  <text x="50%" y="426" text-anchor="middle"
+        font-family="'Orbitron', system-ui, sans-serif"
+        font-size="26" letter-spacing="4"
+        fill="#f4f8ff">
+    DOOM WORLD
+  </text>
+
+  <!-- Small subtext strip -->
+  <rect x="156" y="438" width="200" height="2" fill="#0cf2a5" opacity="0.7"/>
+  <text x="50%" y="460" text-anchor="middle"
+        font-family="system-ui, sans-serif"
+        font-size="11" letter-spacing="3"
+        fill="#7b8a96" opacity="0.85">
+    WASTELAND TAPE · PRIME ASX REALM
+  </text>
+
+  <!-- HUD hash-marks for extra sci-fi flavor -->
+  <g stroke="#0cf2a5" stroke-width="2" opacity="0.75">
+    <line x1="256" y1="42" x2="256" y2="54"/>
+    <line x1="256" y1="458" x2="256" y2="470"/>
+
+    <line x1="76" y1="256" x2="90" y2="256"/>
+    <line x1="422" y1="256" x2="436" y2="256"/>
+
+    <line x1="118" y1="122" x2="128" y2="132"/>
+    <line x1="394" y1="122" x2="384" y2="132"/>
+
+    <line x1="118" y1="390" x2="128" y2="380"/>
+    <line x1="394" y1="390" x2="384" y2="380"/>
+  </g>
+</svg>
