@@ -1,5 +1,5 @@
 # ASX DOOM WORLD
-
+<img src=assets/asx-doom-world-logo-hellfire-pentagram-smallskull.svg>
 A prototype game/runtime sandbox that combines a DOOM-inspired FPS loop with an ASX JSON data layer.
 
 ## Current state (what it is today)
