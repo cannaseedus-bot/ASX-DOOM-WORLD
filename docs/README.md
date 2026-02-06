@@ -24,6 +24,10 @@ A prototype game/runtime sandbox that combines a DOOM-inspired FPS loop with an 
 - `server.js` + `config.json`: JSON server and WebSocket entry point.
 - `docs/`: consolidated documentation.
 
+## Consolidated legacy notes
+- The "Model Builder" prototype docs have been consolidated here; key entry points are `chat.html`, `simple-threejs-demo.html`, `debug-threejs-asx.html`, and `threejs-asx-fantasy-scene.html`.
+- The JSON server prototype references OAuth and file upload ideas, but those are not wired into the current `server.js` runtime.
+
 ## Where it is going (potential phases)
 1. **Phase 1 — Demo consolidation**
    - Pick a single runtime entry point and remove duplicate demos.
@@ -41,3 +45,4 @@ A prototype game/runtime sandbox that combines a DOOM-inspired FPS loop with an 
 ## Notes
 - All documentation is located in `docs/`.
 - `docs/todo.md` tracks cleanup and next steps.
+- Image assets are stored in `assets/`.
